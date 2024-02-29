@@ -230,7 +230,7 @@ imgs = []
 for i in range(100):
     plt.clf()
     q_i = q_x(dataset, torch.tensor([i]))
-    plt.scatter(q_i[:, 0], q_i[:, 1], color='red', degecolor='white', s=5)
+    plt.scatter(q_i[:, 0], q_i[:, 1], color='red', edgecolor='white', s=5)
     plt.axis('off')
 
     img_buf = io.BytesIO()
