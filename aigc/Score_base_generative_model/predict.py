@@ -131,7 +131,7 @@ def ode_sampler(score_model,
         time_steps = torch.tensor(time_steps, device=device, dtype=torch.float32).reshape((sample.shape[0], ))
         with torch.no_grad():
             score = score_model(sample, time_steps)
-        return score.cpu().numpy().reshpae((-1,)).astype(np.float16)
+        return score.cpu().numpy().reshape((-1,)).astype(np.float16)
 
     def ode_func(t, x):
         """ The ODE function for use by the ODE solver."""
