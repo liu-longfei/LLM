@@ -57,3 +57,32 @@ Qwen2ForCausalLM(
   (lm_head): Linear(in_features=4096, out_features=151936, bias=False)
 )
 ```
+## Qwen1.5-72B-Chat
+```
+Qwen2ForCausalLM(
+  (model): Qwen2Model(
+    (embed_tokens): Embedding(152064, 8192)
+    (layers): ModuleList(
+      (0-79): 80 x Qwen2DecoderLayer(
+        (self_attn): Qwen2Attention(
+          (q_proj): Linear(in_features=8192, out_features=8192, bias=True)
+          (k_proj): Linear(in_features=8192, out_features=8192, bias=True)
+          (v_proj): Linear(in_features=8192, out_features=8192, bias=True)
+          (o_proj): Linear(in_features=8192, out_features=8192, bias=False)
+          (rotary_emb): Qwen2RotaryEmbedding()
+        )
+        (mlp): Qwen2MLP(
+          (gate_proj): Linear(in_features=8192, out_features=24576, bias=False)
+          (up_proj): Linear(in_features=8192, out_features=24576, bias=False)
+          (down_proj): Linear(in_features=24576, out_features=8192, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): Qwen2RMSNorm()
+        (post_attention_layernorm): Qwen2RMSNorm()
+      )
+    )
+    (norm): Qwen2RMSNorm()
+  )
+  (lm_head): Linear(in_features=8192, out_features=152064, bias=False)
+)
+```
