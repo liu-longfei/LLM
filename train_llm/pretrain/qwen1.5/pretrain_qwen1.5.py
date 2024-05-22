@@ -1,0 +1,105 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '3,7'
+
+from datasets import load_dataset, DatasetDict
+
+ds_train = load_dataset("/model/data/datasets/codeparrot-ds-train", split="train")
+ds_valid = load_dataset("/model/data/datasets/codeparrot-ds-valid", split="validation")
+
+raw_datasets = DatasetDict(
+    {
+        "train": ds_train.shuffle().select(range(5000)),  # .shuffle().select(range(50000))
+        "valid": ds_valid.shuffle().select(range(500)),  # .shuffle().select(range(500))
+    }
+)
+
+print(len(raw_datasets))
+print(raw_datasets)
+
+# tokenizer
+from transformers import AutoTokenizer
+
+context_length = 128
+tokenizer = AutoTokenizer.from_pretrained("/model/base_model/qwen/Qwen1.5-0.5B-Chat")
+print('------', tokenizer)
+
+outputs = tokenizer(
+    raw_datasets["train"][:2]["content"],
+    truncation=True,
+    max_length=context_length,
+    return_overflowing_tokens=True,
+    return_length=True,
+)
+
+print(f"Input IDs length: {len(outputs['input_ids'])}")
+print(f"Input chunk lengths: {(outputs['length'])}")
+print(f"Chunk mapping: {outputs['overflow_to_sample_mapping']}")
+
+
+def tokenize(element):
+    outputs = tokenizer(
+        element["content"],
+        truncation=True,
+        max_length=context_length,
+        return_overflowing_tokens=True,
+        return_length=True,
+    )
+    input_batch = []
+    for length, input_ids in zip(outputs["length"], outputs["input_ids"]):
+        if length == context_length:
+            input_batch.append(input_ids)
+    return {"input_ids": input_batch}
+
+
+tokenized_datasets = raw_datasets.map(
+    tokenize, batched=True, remove_columns=raw_datasets["train"].column_names
+)
+print(tokenized_datasets)
+
+# 初始化模型
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers.generation import GenerationConfig
+
+
+model = AutoModelForCausalLM.from_pretrained("/model/base_model/qwen/Qwen1.5-0.5B-Chat", device_map="auto", trust_remote_code=True)
+model.generation_config = GenerationConfig.from_pretrained("/model/base_model/qwen/Qwen1.5-0.5B-Chat", trust_remote_code=True)
+model_size = sum(t.numel() for t in model.parameters())
+print(f"qwen size: {model_size/1000**2:.1f}M parameters")
+
+from transformers import DataCollatorForLanguageModeling
+
+tokenizer.pad_token = tokenizer.eos_token
+data_collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
+
+# 预训练
+from transformers import Trainer, TrainingArguments
+
+args = TrainingArguments(
+    output_dir="./qwen_output",
+    per_device_train_batch_size=32,
+    per_device_eval_batch_size=32,
+    evaluation_strategy="steps",
+    eval_steps=5_000,
+    logging_steps=5_000,
+    gradient_accumulation_steps=64,
+    num_train_epochs=1,
+    weight_decay=0.1,
+    warmup_steps=1_000,
+    lr_scheduler_type="cosine",
+    learning_rate=5e-4,
+    save_steps=5_000,
+    fp16=True,
+    push_to_hub=False,
+)
+
+trainer = Trainer(
+    model=model,
+    tokenizer=tokenizer,
+    args=args,
+    data_collator=data_collator,
+    train_dataset=tokenized_datasets["train"],
+    eval_dataset=tokenized_datasets["valid"],
+)
+
+trainer.train()
+trainer.save_model('./save_qwen_model')
