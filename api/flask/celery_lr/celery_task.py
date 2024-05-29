@@ -82,3 +82,7 @@ def fun_cost_time_4(name, sleep_time):
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8000, debug=True)
+
+"""
+celery -A celery_task.celery worker -P eventlet -l info
+"""
