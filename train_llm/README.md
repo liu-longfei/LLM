@@ -1,5 +1,3 @@
-模型评测：
-
-opencompass
-
+模型评测：   
+opencompass    
 https://github.com/open-compass/opencompass
