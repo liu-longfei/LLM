@@ -1,11 +1,45 @@
 import os
+import re
 import shutil
+from docx import Document
 from xml.dom.minidom import parseString
 from zipfile import ZipFile, ZIP_DEFLATED
 from xml.etree import ElementTree as ET
 
 from utils import comments_xml, commentsIds_xml, commentsExtended_xml, people_xml
-from utils import content_types
+from utils import content_types, built_comment_text
+
+
+ET.register_namespace('wpc', "http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas")
+ET.register_namespace('cx', "http://schemas.microsoft.com/office/drawing/2014/chartex")
+ET.register_namespace('cx1', "http://schemas.microsoft.com/office/drawing/2015/9/8/chartex")
+ET.register_namespace('cx2', "http://schemas.microsoft.com/office/drawing/2015/10/21/chartex")
+ET.register_namespace('cx3', "http://schemas.microsoft.com/office/drawing/2016/5/9/chartex")
+ET.register_namespace('cx4', "http://schemas.microsoft.com/office/drawing/2016/5/10/chartex")
+ET.register_namespace('cx5', "http://schemas.microsoft.com/office/drawing/2016/5/11/chartex")
+ET.register_namespace('cx6', "http://schemas.microsoft.com/office/drawing/2016/5/12/chartex")
+ET.register_namespace('cx7', "http://schemas.microsoft.com/office/drawing/2016/5/13/chartex")
+ET.register_namespace('cx8', "http://schemas.microsoft.com/office/drawing/2016/5/14/chartex")
+ET.register_namespace('mc', "http://schemas.openxmlformats.org/markup-compatibility/2006")
+ET.register_namespace('aink', "http://schemas.microsoft.com/office/drawing/2016/ink")
+ET.register_namespace('am3d', "http://schemas.microsoft.com/office/drawing/2017/model3d")
+ET.register_namespace('o', "urn:schemas-microsoft-com:office:office")
+ET.register_namespace('r', "http://schemas.openxmlformats.org/officeDocument/2006/relationships")
+ET.register_namespace('m', "http://schemas.openxmlformats.org/officeDocument/2006/math")
+ET.register_namespace('v', "urn:schemas-microsoft-com:vml")
+ET.register_namespace('wp14', "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing")
+ET.register_namespace('wp', "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing")
+ET.register_namespace('w10', "urn:schemas-microsoft-com:office:word")
+ET.register_namespace('w', "http://schemas.openxmlformats.org/wordprocessingml/2006/main")
+ET.register_namespace('w14', "http://schemas.microsoft.com/office/word/2010/wordml")
+ET.register_namespace('w15', "http://schemas.microsoft.com/office/word/2012/wordml")
+ET.register_namespace('w16cid', "http://schemas.microsoft.com/office/word/2016/wordml/cid")
+ET.register_namespace('w16se', "http://schemas.microsoft.com/office/word/2015/wordml/symex")
+ET.register_namespace('wpg', "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup")
+ET.register_namespace('wpi', "http://schemas.microsoft.com/office/word/2010/wordprocessingInk")
+ET.register_namespace('wne', "http://schemas.microsoft.com/office/word/2006/wordml")
+ET.register_namespace('wps', "http://schemas.microsoft.com/office/word/2010/wordprocessingShape")
+ET.register_namespace('Ignorable', "w14 w15 w16se w16cid wp14")
 
 
 # 新建文件夹，并将文件解压缩到指定的文件夹
@@ -94,8 +128,69 @@ def modify_content_types_xml(target_path):
 
 
 # 修改word/document.xml文件内容-->根据给定内容加批注
-def modify_word_document(target_path, comment_content):
-    word_document_path = os.path.join(target_path, '/word/document.xml')
+def modify_word_document(docx_path, target_path, comment_content):
+    word_document_xml_path = os.path.join(target_path, 'word/document.xml')
+    # 查询含有命名空间的字符串,为后期替换不带命名空间的<w:document>做准备
+    with open(word_document_xml_path, 'r', encoding='utf-8') as f:
+        xml_str = f.read()
+    pattern = r'<w:document.*?>'
+    xml_document_str = re.search(pattern, xml_str, re.DOTALL).group()
+    # print(xml_document_str)
+
+    # 确定加批注的内容在第几段落
+    doc = Document(docx_path)
+    idx_para = -1
+    for idx, paragraph in enumerate(doc.paragraphs):
+        # print(idx, paragraph.text)
+        if comment_content in paragraph.text:
+            # print(paragraph.text)
+            idx_para = idx
+            break
+    if idx_para == -1:
+        return None
+
+    # 解析xml文件
+    tree = ET.parse(word_document_xml_path)
+    root = tree.getroot()
+
+    # 为xml段落和document的段落寻找起增量，便于根据document的段落定位到xml的段落
+    para_idx_add = [0]  # document的段落和xml段落的增量列表
+    for idx, para in enumerate(root[0]):
+        if idx == 0:
+            continue
+        elif idx != 0 and para.tag.endswith('}p'):
+            para_idx_add.append(para_idx_add[idx - 1])
+        else:
+            para_idx_add.append(para_idx_add[idx - 1] + 1)
+
+    # 在xml中的段落
+    xml_para_num = idx_para + para_idx_add[idx_para]
+
+    # 构建批注的段落
+    comment_para_element_text = built_comment_text(comment_content, doc.paragraphs[idx_para].text)
+
+    # 获取xml段落的paraId
+    for key, val in root[0][xml_para_num].attrib.items():
+        if 'paraId' in key:
+            paraId = val
+    print(paraId)
+
+    new_xml_str = ET.tostring(root)
+    xml_parsed = parseString(new_xml_str)
+    pretty_xml_str = xml_parsed.toprettyxml()
+
+    # 找到需要替换掉的comment段落
+    pattern = f'<w:p.*?"{paraId}".*?">(.*?)</w:p>'
+    old_comment_str = re.search(pattern, pretty_xml_str, re.DOTALL).group(1)
+
+    # 替换内容
+    pretty_xml_str = pretty_xml_str.replace(old_comment_str, comment_para_element_text)
+    pretty_xml_str = pretty_xml_str.replace('<?xml version="1.0" ?>',
+                                            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>')
+    print(pretty_xml_str)
+
+    with open(os.path.join(target_path, 'word/document.xml'), 'w', encoding='utf-8') as f:
+        f.write(pretty_xml_str)
 
 
 # 将解压的文件重新压缩成docx文件
@@ -115,6 +210,7 @@ if __name__ == '__main__':
     docx_path = r"C:\Users\LW0016778\Desktop\test_docx\test\temp1.docx"
     target_path = r"C:\Users\LW0016778\Desktop\test_docx\test\unzip"
     new_docx_file = r"C:\Users\LW0016778\Desktop\test_docx\test\temp1-test.docx"
+    comment_content = '识别表格中的内'
 
     check_file_path(docx_path, target_path)
     # 创建comments.xml, commentsIds.xml, commentsExtended.xml, people.xml
@@ -124,7 +220,7 @@ if __name__ == '__main__':
     # 修改 [content_Types].xml文件内容
     modify_content_types_xml(target_path)
     # 修改word/document.xml文件内容-->根据给定内容加批注
-    modify_word_document(target_path)
+    modify_word_document(docx_path, target_path, comment_content)
 
     # 将解压的文件重新压缩成docx文件
-    # zip_files(new_docx_file, target_path)
+    zip_files(new_docx_file, target_path)
