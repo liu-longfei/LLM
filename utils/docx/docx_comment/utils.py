@@ -175,3 +175,67 @@ content_types = """    <Override PartName="/word/comments.xml"
         ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.people+xml" />
 </Types>"""
 
+
+def built_comment_text(comment_str: str, full_str: str, comment_id: int = 0):
+    split_list = full_str.split(comment_str)
+    if not split_list[0] and split_list[1]:
+        # ['', '123456']
+        comment_xml_str = f"""<w:commentRangeStart w:id="{comment_id}" />
+            <w:r>
+                <w:t>{comment_str}</w:t>
+            </w:r>
+        <w:commentRangeEnd w:id="{comment_id}" />
+        <w:r w:rsidR="00766759">
+            <w:rPr>
+                <w:rStyle w:val="a9" />
+            </w:rPr>
+            <w:commentReference w:id="0" />
+        </w:r>
+        <w:r>
+            <w:t>{split_list[1]}</w:t>
+        </w:r>
+        <w:r w:rsidR="00526166">
+                <w:t xml:space="preserve"> </w:t>
+        </w:r>"""
+    elif split_list[0] and not split_list[1]:
+        # ['abc123', '']
+        comment_xml_str = f"""<w:r>
+                    <w:t>{split_list[0]}</w:t>
+                </w:r>
+                <w:commentRangeStart w:id="{comment_id}" />
+                    <w:r>
+                        <w:t>{comment_str}</w:t>
+                    </w:r>
+                <w:commentRangeEnd w:id="{comment_id}" />
+                <w:r w:rsidR="00766759">
+                    <w:rPr>
+                        <w:rStyle w:val="a9" />
+                    </w:rPr>
+                    <w:commentReference w:id="0" />
+                </w:r>
+                <w:r w:rsidR="00526166">
+                        <w:t xml:space="preserve"> </w:t>
+                </w:r>"""
+    else:
+        # ['abc', '456']
+        comment_xml_str = f"""<w:r>
+                            <w:t>{split_list[0]}</w:t>
+                        </w:r>
+                        <w:commentRangeStart w:id="{comment_id}" />
+                            <w:r>
+                                <w:t>{comment_str}</w:t>
+                            </w:r>
+                        <w:commentRangeEnd w:id="{comment_id}" />
+                        <w:r w:rsidR="00766759">
+                            <w:rPr>
+                                <w:rStyle w:val="a9" />
+                            </w:rPr>
+                            <w:commentReference w:id="0" />
+                        </w:r>
+                        <w:r>
+                            <w:t>{split_list[1]}</w:t>
+                        </w:r>
+                        <w:r w:rsidR="00526166">
+                                <w:t xml:space="preserve"> </w:t>
+                        </w:r>"""
+    return comment_xml_str
