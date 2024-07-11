@@ -133,8 +133,8 @@ def modify_word_document(docx_path, target_path, comment_content):
     # 查询含有命名空间的字符串,为后期替换不带命名空间的<w:document>做准备
     with open(word_document_xml_path, 'r', encoding='utf-8') as f:
         xml_str = f.read()
-    pattern = r'<w:document.*?>'
-    xml_document_str = re.search(pattern, xml_str, re.DOTALL).group()
+    document_head_pattern = r'<w:document.*?>'
+    old_xml_document_str = re.search(document_head_pattern, xml_str, re.DOTALL).group()
     # print(xml_document_str)
 
     # 确定加批注的内容在第几段落
@@ -179,6 +179,10 @@ def modify_word_document(docx_path, target_path, comment_content):
     xml_parsed = parseString(new_xml_str)
     pretty_xml_str = xml_parsed.toprettyxml()
 
+    # 替换document.xml文件头内容
+    new_xml_document_str = re.search(document_head_pattern, pretty_xml_str, re.DOTALL).group()
+    pretty_xml_str = pretty_xml_str.replace(new_xml_document_str, old_xml_document_str)
+
     # 找到需要替换掉的comment段落
     pattern = f'<w:p.*?"{paraId}".*?">(.*?)</w:p>'
     old_comment_str = re.search(pattern, pretty_xml_str, re.DOTALL).group(1)
@@ -191,6 +195,10 @@ def modify_word_document(docx_path, target_path, comment_content):
 
     with open(os.path.join(target_path, 'word/document.xml'), 'w', encoding='utf-8') as f:
         f.write(pretty_xml_str)
+    print('----------------------------------')
+    print(old_xml_document_str)
+    print('----------------------------------')
+    print(new_xml_document_str)
 
 
 # 将解压的文件重新压缩成docx文件
@@ -210,7 +218,7 @@ if __name__ == '__main__':
     docx_path = r"C:\Users\LW0016778\Desktop\test_docx\test\temp1.docx"
     target_path = r"C:\Users\LW0016778\Desktop\test_docx\test\unzip"
     new_docx_file = r"C:\Users\LW0016778\Desktop\test_docx\test\temp1-test.docx"
-    comment_content = '识别表格中的内'
+    comment_content = "列表样式（Headin"
 
     check_file_path(docx_path, target_path)
     # 创建comments.xml, commentsIds.xml, commentsExtended.xml, people.xml
