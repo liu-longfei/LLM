@@ -158,9 +158,9 @@ people_xml = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml"
     xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
     mc:Ignorable="w14 w15 w16se w16cid wp14">
-    <w15:person w15:author="AI">
+    <w15:person w15:author="AI-COMMENT">
         <w15:presenceInfo w15:providerId="AD"
-            w15:userId="S-1-5-21-3808830583-297594534-675914885-31078" />
+            w15:userId="S-1-5-21-3808830583-297594534-675914885-31099" />
     </w15:person>
 </w15:people>"""
 
