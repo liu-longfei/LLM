@@ -10,6 +10,9 @@ https://ai.ywzxkj.com/
 ## 好用字体
 'Cascadia Code', 'Fira Code'
 
+## poetry
+https://notes.zhengxinonly.com/environment/use-poetry.html
+
 # 数据集
 ## 1.预训练数据集
 悟道数据集
