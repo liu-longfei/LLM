@@ -45,3 +45,6 @@ https://huggingface.co/datasets/michaelwzhu/ShenNong_TCM_Dataset
 https://github.com/FutureForMe/Chinese_Medical_Natural_Language_Processing_Resources_and_Papers
 https://github.com/shibing624/MedicalGPT
 
+tavily:
+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
+
