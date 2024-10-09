@@ -6,8 +6,12 @@ https://spaces.ac.cn/archives/9119
 
 ## 免费GPT网站
 
-https://github.com/LiLittleCat/awesome-free-chatgpt/blob/main/README_en.md
-https://ai.ywzxkj.com/
+https://github.com/LiLittleCat/awesome-free-chatgpt/blob/main/README_en.md   
+https://ai.ywzxkj.com/   
+https://chat.tinycms.xyz:3002/#/chat   
+https://www.freegpt.pl/?from=tz   
+https://www.freegpt.pl/?from=tongzhi   
+https://freegpt.es/?from=tongzhi   
 
 ## 好用字体
 
