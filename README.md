@@ -54,8 +54,16 @@ https://huggingface.co/datasets/michaelwzhu/ShenNong_TCM_Dataset
 https://github.com/FutureForMe/Chinese_Medical_Natural_Language_Processing_Resources_and_Papers
 https://github.com/shibing624/MedicalGPT
 
-tavily:
+## api_key
+### SerpAPIWrapper
+from langchain import SerpAPIWrapper
+# 为了使用谷歌搜索（SERPAPI）， WolframAlpha，您需要自行申请它们的 API KEY，然后填入此处
+os.environ['SERPAPI_API_KEY'] = '9a860ad90aa50f9428933bb26c636e7cceb7155133e8a51dcb2d6d460df4d9ba'
+os.environ['WOLFRAM_ALPHA_APPID'] = 'RH4ERE-VHKHLVUA8A'
+
+
+### tavily:
 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
 
-langchain:
+### langchain:
 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
