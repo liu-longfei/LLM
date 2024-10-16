@@ -4,6 +4,9 @@
 
 https://spaces.ac.cn/archives/9119
 
+## 浏览器翻译插件
+https://immersivetranslate.com/
+
 ## 免费GPT网站
 
 https://github.com/LiLittleCat/awesome-free-chatgpt/blob/main/README_en.md   
