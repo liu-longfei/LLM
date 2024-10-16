@@ -72,4 +72,5 @@ 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
 https://serper.dev/dashboard
 os.environ["SERPER_API_KEY"] = "ce8271080378a939bd4eadc024b81c1a339bcca1"
 
-
+### Google Cloud
+AIzaSyDHIO8co1cAIJJRsswIm3oKq8q--Bkglv8
