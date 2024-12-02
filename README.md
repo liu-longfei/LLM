@@ -8,6 +8,9 @@ https://spaces.ac.cn/archives/9119
 https://immersivetranslate.com/    
 https://immersivetranslate.com/zh-Hans/
 
+## 书籍
+https://github.com/LLMBook-zh/LLMBook-zh.github.io
+
 ## 免费GPT网站
 
 https://github.com/LiLittleCat/awesome-free-chatgpt/blob/main/README_en.md   
