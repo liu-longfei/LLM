@@ -4,8 +4,9 @@
 
 https://spaces.ac.cn/archives/9119
 
-## 浏览器翻译插件
+## 浏览器翻译插件（沉浸式翻译）
 https://immersivetranslate.com/
+https://immersivetranslate.com/zh-Hans/
 
 ## 免费GPT网站
 
