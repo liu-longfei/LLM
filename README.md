@@ -19,6 +19,7 @@ https://chat.tinycms.xyz:3002/#/chat
 https://www.freegpt.pl/?from=tz   
 https://www.freegpt.pl/?from=tongzhi   
 https://freegpt.es/?from=tongzhi   
+https://gpt4o.so/zh-CN （开无痕模式可以一直用G）   
 
 ## 好用字体
 
