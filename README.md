@@ -29,6 +29,16 @@ https://gpt4o.so/zh-CN （开无痕模式可以一直用GPT 4o，写作必备）
 
 https://notes.zhengxinonly.com/environment/use-poetry.html
 
+# Ubuntu
+## 安装中文输入法
+```bash
+1、sudo apt install ibus-rime
+2、设置->键盘->输入源->添加输入源->选择中文（rime）->添加
+3、改为横向展示： vim ~/.config/ibus/rime/build/ibus_rime.yaml
+4、horizontal: true
+5、重启：ibus restart
+```
+
 # 数据集
 
 ## 1.预训练数据集
