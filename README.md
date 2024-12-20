@@ -37,6 +37,9 @@ https://notes.zhengxinonly.com/environment/use-poetry.html
 3、改为横向展示： vim ~/.config/ibus/rime/build/ibus_rime.yaml
 4、horizontal: true
 5、重启：ibus restart
+
+# ubuntu设置再次点击图标，画面隐藏
+gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize'
 ```
 
 # 数据集
