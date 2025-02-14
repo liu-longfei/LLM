@@ -72,7 +72,7 @@
 
 <img src="img\006_shufflenet_v1_1.png" alt="image-20250212081536501" style="zoom:80%;" />
 
-![image-20250212081730103](img\006_shufflenet_v1_2.png)
+<img src='img\006_shufflenet_v1_2.png'>
 
 ## ShuffleNetv2
 
@@ -80,25 +80,25 @@
 
 **内存访问成本**(memory access cost)和**平台特点**(platform characterics)。
 
-![image-20250212081901609](img\006_shufflenet_v2_1.png)
+<img src='img\006_shufflenet_v2_1.png'>
 
 **证明准则一：**
 
-![image-20250212082005263](img\006_shufflenet_v2_2.png)
+<img src='img\006_shufflenet_v2_2.png'>
 
 **证明准则二：**
 
-![image-20250212082055141](img\006_shufflenet_v2_3.png)
+<img src='img\006_shufflenet_v2_3.png'>
 
-![image-20250212082139332](img\006_shufflenet_v2_4.png)
+<img src='img\006_shufflenet_v2_4.png'>
 
 **ShuffleNetv1和ShuffleNetv2对比：**
 
-![image-20250212082223022](img\006_shufflenet_v2_5.png)
+<img src='img\006_shufflenet_v2_5.png'>
 
 # 转置卷积
 
-![image-20250212082447823](img\007_transpose_convolution.png)
+<img src='img\007_transpose_convolution.png'>
 
 # FCN
 
@@ -110,7 +110,7 @@
 
 **网络结构图：**
 
-![image-20250212082638356](img\008_FCN.png)
+<img src='img\008_FCN.png'>
 
 **FCN 的优势在于：** 
 
@@ -134,7 +134,7 @@ Skip connection：两者都用了这样的结构，虽然在现在看来这样�
 
 **U-Net结构图**
 
-![image-20250212082846100](img\008_U-Net.png)
+<img src='img\008_U-Net.png'>
 
 **U-Net结构的解析**
 
@@ -170,7 +170,7 @@ U-Net和FCN非常的相似，U-Net比FCN稍晚提出来，但都发表在2015年
 
 Rcnn系列和yolo系列的发表时间线：
 
-![image-20250213080737965](img\010_object_detection.png)
+<img src="img\010_object_detection.png" alt="image-20250213080737965" style="zoom:80%;" />
 
 ​        目标检测技术从阶段上分为两种，一阶段和二阶段。二阶段的核心思想是首先提出proposal框，通过第一阶段的网络回归出目标框的大概位置、大小及是前景的概率，第二阶段是通过另一个网络回归出目标框的位置、大小及类别；而一阶段网络的核心是，对于输入图像，通过网络直接回归出目标大小、位置和类别。
 
@@ -209,11 +209,11 @@ https://blog.csdn.net/HUAI_BI_TONG/article/details/121212733
 
 用一个 softmax 层代替支持向量机，对用于预测的神经网络进行扩展，而不是创建一个新的模型。
 
-![image-20250213081804104](img\012_object_detection_Fast-R-CNN_1.png)
+<img src="img\012_object_detection_Fast-R-CNN_1.png" alt="image-20250213081804104" style="zoom:80%;" />
 
-![image-20250213082024590](img/012_object_detection_Fast-R-CNN_2.png)
+<img src="img/012_object_detection_Fast-R-CNN_2.png" alt="image-20250213082024590" />
 
-![image-20250213082052343](img/012_object_detection_Fast-R-CNN_3.png)
+<img src="img/012_object_detection_Fast-R-CNN_3.png" alt="image-20250213082052343" />
 
 ## Faster R-CNN
 
@@ -222,23 +222,23 @@ https://blog.csdn.net/HUAI_BI_TONG/article/details/121212733
 1. 该算法用一个快速神经网络代替了运算速度很慢的选择性搜索算法：通过插入区域提议网络（ RPN ），来预测来自特征的建议。 RPN 决定查看“哪里”，这样可以减少整个推理过程的计算量。
 2. RPN 快速且高效地扫描每一个位置，来评估在给定的区域内是否需要作进一步处理，其实现方式如下：通过输出k个边界框建议，每个边界框建议都有 2 个值——代表每个位置包含目标对象和不包含目标对象的概率。
 
-![image-20250213082242226](img/013_object_detection_Fast-R-CNN_1.png)
+<img src="img/013_object_detection_Fast-R-CNN_1.png" alt="image-20250213082242226" />
 
-![image-20250213082337990](img/013_object_detection_Fast-R-CNN_2.png)
+<img src="img/013_object_detection_Fast-R-CNN_2.png" alt="image-20250213082337990" />
 
-![image-20250213082357397](img/013_object_detection_Fast-R-CNN_3.png)
+<img src="img/013_object_detection_Fast-R-CNN_3.png" alt="image-20250213082357397" />
 
-![image-20250213082418906](img/013_object_detection_Fast-R-CNN_4.png)
+<img src="img/013_object_detection_Fast-R-CNN_4.png" alt="image-20250213082418906" />
 
 ## 不同尺度的anchor怎么对应到不同的特征层上
 
 **FPN中的：**
 
-![image-20250213082506574](img/014_object_detection_anchor_0.png)
+<img src="img/014_object_detection_anchor_0.png" alt="image-20250213082506574" />
 
 **Pytorch官方的实现代码**
 
-![image-20250213082548120](img/014_object_detection_anchor_1.png)
+<img src="img/014_object_detection_anchor_1.png" alt="image-20250213082548120" />
 
 ## SSD
 
@@ -252,7 +252,7 @@ https://blog.csdn.net/HUAI_BI_TONG/article/details/121212733
 
 ​         所谓多尺度采用大小不同的特征图，CNN网络一般前面的特征图比较大，后面会逐渐采用stride=2的卷积或者pool来降低特征图大小，这正如下图所示，一个比较大的特征图和一个比较小的特征图，它们都用来做检测。这样做的好处是比较大的特征图来用来检测相对较小的目标，而小的特征图负责检测大目标，如图4所示，8x8的特征图可以划分更多的单元，但是其每个单元的先验框尺度比较小。
 
-![image-20250213082721575](img/015_object_detection_ssd_0.png)
+<img src="img/015_object_detection_ssd_0.png" alt="image-20250213082721575" />
 
 2. 采用卷积进行检测
 
@@ -262,7 +262,7 @@ https://blog.csdn.net/HUAI_BI_TONG/article/details/121212733
 
 ​        在Yolo中，每个单元预测多个边界框，但是其都是相对这个单元本身（正方块），但是真实目标的形状是多变的，Yolo需要在训练过程中自适应目标的形状。而SSD借鉴了Faster R-CNN中anchor的理念，每个单元设置尺度或者长宽比不同的先验框，预测的边界框（bounding boxes）是以这些先验框为基准的，在一定程度上减少训练难度。一般情况下，每个单元会设置多个先验框，其尺度和长宽比存在差异，如图5所示，可以看到每个单元使用了4个不同的先验框，图片中猫和狗分别采用最适合它们形状的先验框来进行训练，后面会详细讲解训练过程中的先验框匹配原则。
 
-![image-20250213082850455](img/015_object_detection_ssd_1.png)
+<img src="img/015_object_detection_ssd_1.png" alt="image-20250213082850455" />
 
 **网络结构**
 
@@ -278,7 +278,7 @@ https://blog.csdn.net/HUAI_BI_TONG/article/details/121212733
 
 <img src="img/015_object_detection_ssd_2.png" alt="image-20250213083047417" style="zoom:80%;" />
 
-![image-20250213083111142](img/015_object_detection_ssd_3.png)
+<img src="img/015_object_detection_ssd_3.png" alt="image-20250213083111142" />
 
 **预测过程**：
 
