@@ -58,13 +58,13 @@
 
 ## MobileNetv2
 
-![image-20250212081131661](img\005_mobilenet_v2.png)
+<img src='img\005_mobilenet_v2.png'>
 
-![image-20250212081223925](img\005_mobilenet_v2_1.png)
+<img src='img\005_mobilenet_v2_1.png'>
 
 **下图左mobilenetv1、右图mobilenetv2**
 
-![image-20250212081346234](img\005_mobilenet_v2_2.png)
+<img src='img\005_mobilenet_v2_2.png'>
 
 ## shuffleNetv1
 
