@@ -457,3 +457,219 @@ YOLO V2的darknet-19（特征提取网络）在YOLO V3中变成了darknet-53
 YOLO V3也借鉴了FPN层的结构
 
 使用了多级检测（multi-level detection），分别检测大目标和小目标。
+
+<img src="img/019_object_detection_yolov3_0.png" alt="image-20250216174350965" />
+
+<img src="img/019_object_detection_yolov3_1.png" alt="image-20250216174422204" />
+
+**YOLO V3的损失函数**
+
+​		损失函数看似包含了**五个部分**，实际是***三个部分***：预测框的位置损失+预测框预测的类别损失+预测框置信度损失
+
+<img src="img/019_object_detection_yolov3_2.png" alt="image-20250216174530892" />
+
+<img src="img/019_object_detection_yolov3_3.png" alt="image-20250216174554314" />
+
+## YOLOv4
+
+​		YOLO V4更像一篇目标检测模型Tricks文献综述, 就是筛选了一些从YOLO V3发布至今，被用在各式各样检测器上，能够提高检测精度的tricks，并以YOLO V3为基础进行改进的目标检测模型。YOLO V4在保证速度的同时，大幅提高模型的检测精度(当然，这是相较于YOLO V3的）。
+
+<img src="img/020_object_detection_yolov4_0.png" alt="image-20250216174641314" style="zoom:80%;" />
+
+### 1.1 网络结构
+
+- Backbone: CSPDarknet53
+- Neck: SPP，PAN
+- Head: YOLOv3
+
+<img src="img/020_object_detection_yolov4_1.png" alt="image-20250216174810015" style="zoom:80%;" />
+
+<img src="img/020_object_detection_yolov4_2.png" alt="image-20250216174841039" />
+
+#### 1.1.1 CSP
+
+<img src="img/020_object_detection_yolov4_3.png" alt="image-20250216174942128" style="zoom:80%;" />
+
+<img src="img/020_object_detection_yolov4_4.png" alt="image-20250216175203254" />
+
+### 1.2 优化策略
+
+1.2.1 Eliminate grid sensitivity
+
+1.2.2 Mosaic data augmentation
+
+1.2.3 IoU threshold（正样本匹配）
+
+### 1.3 损失函数：
+
+​		意思就是MSE损失函数将检测框***\*中心点坐标\****和***\*宽高\****等信息作为***\*独立的变量\****对待的，但是实际上他们之间是有关系的。从直观上来说，框的中心点和宽高的确存在着一定的关系。所以解决方法是使用***\*IOU损失\****代替MSE损失。
+
+- （1）IOU损失
+
+缺点：该损失函数只在bounding box重叠的时候才管用，在他们没有重叠情况下，将不会提供滑动梯度。收敛速度慢，定位不精准。
+
+<img src="img/020_object_detection_yolov4_5.png" alt="image-20250216175426648" />
+
+- （2）GIOU损失
+
+缺点：两个框水平或者垂直时，GIoU会退化成IoU。收敛速度慢，定位不精准。
+
+<img src="img/020_object_detection_yolov4_6.png" alt="image-20250216175503409" />
+
+<img src="img/020_object_detection_yolov4_7.png" alt="image-20250216175525700" style="zoom:67%;" />
+
+- （3）DIOU损失
+
+缺点：没有考虑到回归框的长宽比。
+
+<img src="img/020_object_detection_yolov4_8.png" alt="image-20250216175608296" />
+
+<img src="img/021_object_detection_yolov4_8.png" alt="image-20250216175634343" />
+
+- （4）CIOU损失
+
+<img src="img/021_object_detection_yolov4_9.png" alt="image-20250216175708597" style="zoom:80%;" />
+
+<img src="img/021_object_detection_yolov4_10.png" alt="image-20250216175733922" />
+
+### 1.4 激活函数
+
+**Mish激活函数**
+
+<img src="img/021_object_detection_yolov4_11.png" alt="image-20250216175838217" />
+
+<img src="img/021_object_detection_yolov4_12.png" alt="image-20250216175858835" />
+
+<img src="img/021_object_detection_yolov4_13.png" alt="image-20250216175919120" />
+
+## YOLOv5
+
+### 1 网络结构
+
+- ***Backbone***: New CSP-Darknet53
+
+- ***Neck***: SPPF, New CSP-PAN
+
+- ***Head***: YOLOv3 Head
+
+<img src="img/022_object_detection_yolov5_0.png" alt="image-20250216180114731" />
+
+**在Neck部分的变化还是相对较大的，首先是将SPP换成成了SPPF**
+
+<img src="img/022_object_detection_yolov5_1.png" alt="image-20250216180159821" style="zoom:80%;" />
+
+<img src="img/023_object_detection_yolov5_1.png" alt="image-20250216180225507" style="zoom:80%;" />
+
+​		而SPPF结构是将输入串行通过多个5x5大小的MaxPool层，这里需要注意的是串行两个5x5大小的MaxPool层是和一个9x9大小的MaxPool层计算结果是一样的，串行三个5x5大小的MaxPool层是和一个13x13大小的MaxPool层计算结果是一样的。
+
+### 2 数据增强
+
+- ***Mosaic***，将四张图片拼成一张图片
+
+<img src="img/023_object_detection_yolov5_2.png" alt="image-20250216180320173" />
+
+- ***Copy paste***，将部分目标随机的粘贴到图片中，前提是数据要有segments数据才行，即每个目标的实例分割信息。下面是Copy paste原论文中的示意图。
+
+<img src="img/023_object_detection_yolov5_3.png" alt="image-20250216180410516" style="zoom:80%;" />
+
+- ***Random affine(Rotation, Scale, Translation and Shear)***，随机进行仿射变换，但根据配置文件里的超参数发现只使用了Scale和Translation即缩放和平移。
+
+<img src="img/023_object_detection_yolov5_4.png" alt="image-20250216180454295" />
+
+- ***MixUp***，就是将两张图片按照一定的透明度融合在一起，具体有没有用不太清楚，毕竟没有论文，也没有消融实验。代码中只有较大的模型才使用到了MixUp，而且每次只有10%的概率会使用到。
+
+<img src="img/023_object_detection_yolov5_5.png" alt="image-20250216180535382" style="zoom:80%;" />
+
+### 3 训练策略
+
+在YOLOv5源码中使用到了很多训练的策略，这里简单总结几个我注意到的点，还有些没注意到的请大家自己看下源码：
+
+![image-20250216180622745](img/023_object_detection_yolov5_6.png)
+
+### 4 其他
+
+<img src="img/023_object_detection_yolov5_7.png" alt="image-20250216180655854" />
+
+<img src="img/023_object_detection_yolov5_8.png" alt="image-20250216180717651" />
+
+<img src="img/023_object_detection_yolov5_9.png" alt="image-20250216180739587" />
+
+<img src="img/023_object_detection_yolov5_10.png" alt="image-20250216180759790" />
+
+<img src="img/023_object_detection_yolov5_11.png" alt="image-20250216180827310" />
+
+<img src="img/023_object_detection_yolov5_12.png" alt="image-20250216180845809" />
+
+## Yolo系列对比
+
+**Yolov3：**
+
+- ***Backbone:*** DarkNet53
+
+- ***Neck:***FPN
+
+- ***Head:*** YOLOv3
+
+**Yolov4：**
+
+- ***Backbone：***CSPDarkNet53
+
+- ***Neck:*** SPP (Spatial Pyramid Pooling), PAN (Path Aggregation Network)
+
+- ***Head:*** YOLOv3
+
+(CSP: Cross Stage Partial Network)
+
+**Yolov5：**
+
+- ***Backbone ：***New CSP-Darknet53
+
+- ***Neck:*** SPPF, New CSP-PAN
+
+- ***Head:*** YOLOv3
+
+激活函数：SiLU、Swish
+
+**Smooth L1损失函数：**
+
+<img src="img/023_object_detection_yolov5_13.png" alt="image-20250216181214441" />
+
+smooth L1损失函数曲线如下图所示，作者这样设置的目的是想让loss对于离群点更加鲁棒，相比于L2损失函数，其对离群点（指的是距离中心较远的点）、异常值（outlier）不敏感，可控制梯度的量级使训练时不容易跑飞。
+
+<img src="img/023_object_detection_yolov5_14.png" alt="image-20250216181240100" />
+
+## BN层和LN层：
+
+<img src="img/023_object_detection_yolov5_15.png" alt="image-20250216181316464" />
+
+**看源码步骤：**
+
+1. 数据预处理。
+2. 网络搭建。
+3. 损失函数计算。
+
+卷积网络中flops的计算：
+
+<img src="img/023_object_detection_yolov5_16.png" alt="image-20250216181400390" />
+
+# 算法：
+
+求p和q的最大公约数(欧几里得算法：计算两个非负整数 p 和 q 的最大公约数：若 q 是 0，则最大公约数为 p。否则，将 p 除以 q 得到余数 r，p 和 q 的最大公约数即为 q 和 r 的最大公约数。)
+
+```python
+def gcd(p:int， q:int):
+	If q == 0:
+		Return p
+	r = p % q
+	return gcd(q, r)
+```
+
+<img src="img/023_object_detection_yolov5_17.png" alt="image-20250216191728709" />
+
+## MaxPooling层的作用：
+
+​		简而言之，使用下采样的原因，一是减少需要处理的特征图的元素个数，二是通过让连续 卷积层的观察窗口越来越大（即窗口覆盖原始输入的比例越来越大），从而引入空间过滤器的层 级结构。
+
+## 目标跟踪
+
+<img src="img/023_object_detection_yolov5_18.png" alt="image-20250216191822784" />
