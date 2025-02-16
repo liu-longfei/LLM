@@ -295,3 +295,165 @@ https://blog.csdn.net/HUAI_BI_TONG/article/details/121212733
 ## Yolov1
 
 **Yolov1网络结构**
+
+<img src="img/016_object_detection_yolov1_0.png" alt="image-20250216062419863" />
+
+​       直接上结构图，输入图像大小为448*448，经过若干个卷积层与池化层，变为7*7*1024张量（图一中倒数第三个立方体），最后经过两层全连接层，输出张量维度为7*7*30，这就是Yolo v1的整个神经网络结构，和一般的卷积物体分类网络没有太多区别，最大的不同就是：分类网络最后的全连接层，一般连接于一个一维向量，向量的不同位代表不同类别，而这里的输出向量是一个三维的张量（7*7*30）。上图中Yolo的backbone网络结构，受启发于GoogLeNet，也是v2、v3中Darknet的先锋。本质上来说没有什么特别，没有使用BN层，用了一层Dropout。除了最后一层的输出使用了线性激活函数，其他层全部使用Leaky Relu激活函数。网络结构没有特别的东西，不再赘述。
+
+1. 7*7的含义
+
+7*7是指图片被分成了7*7个格子，如下所示：
+
+<img src="img/016_object_detection_yolov1_1.png" alt="image-20250216062536223" />
+
+一幅图片分成7x7个网格(grid cell)，某个物体的中心落在这个网格中此网格就负责预测这个物体。
+
+最后一层输出为 （7*7）*30的维度。每个 1*1*30的维度对应原图7*7个cell中的一个，1*1*30中含有类别预测和bbox坐标预测。总得来讲就是让网格负责类别信息，bounding box主要负责坐标信息(部分负责类别信息：confidence也算类别信息)。具体如下：
+
+<img src="img/016_object_detection_yolov1_2.png" alt="image-20250216062614058" />
+
+<img src="img/016_object_detection_yolov1_3.png" alt="image-20250216062635083" />
+
+测试时：
+
+<img src="img/016_object_detection_yolov1_4.png" alt="image-20250216062705917" />
+
+<img src="img/016_object_detection_yolov1_5.png" alt="image-20250216062726152" />
+
+**YOLOv1损失函数**
+
+<img src="img/016_object_detection_yolov1_6.png" alt="image-20250216062812706" />
+
+**YOLO主要特点是：**
+
+速度快，能够达到实时的要求。在 Titan X 的 GPU 上 能够达到 45 帧每秒。
+
+使用全图作为 Context 信息，背景错误（把背景错认为物体）比较少。
+
+泛化能力强。
+
+**YOLO的缺点**
+
+YOLO对相互靠的很近的物体，还有很小的群体 检测效果不好，这是因为一个网格中只预测了两个框，并且只属于一类。
+
+对[测试](http://lib.csdn.net/base/softwaretest)图像中，同一类物体出现的新的不常见的长宽比和其他情况是。泛化能力偏弱。
+
+由于损失函数的问题，定位误差是影响检测效果的主要原因。尤其是大小物体的处理上，还有待加强。
+
+## Yolov2（yolo9000）
+
+先解释概念：Yolov2和Yolo9000算法内核相同，区别是训练方式不同：Yolov2用coco数据集训练后，可以识别80个种类。而Yolo9000可以使用coco数据集 + ImageNet数据集联合训练，可以识别9000多个种类。图一为Yolo9000的检测效果图，可以看到图片中的人，被分为了leader、American、skin-diver、athlete。
+
+文首先介绍Yolov2，列举出基于v1所做的改进；之后解读Yolo9000的训练方法。
+
+**Better**
+
+1. Batch Normalization（批归一化）
+
+检测系列的网络结构中，BN逐渐变成了标配。在Yolo的每个卷积层中加入BN之后，mAP提升了2%，并且去除了Dropout。
+
+2. High Resolution Classifier（分类网络高分辨率预训练）
+
+在Yolov1中，网络的backbone部分会在ImageNet数据集上进行预训练，训练时网络输入图像的分辨率为224*224。在v2中，将分类网络在输入图片分辨率为448*448的ImageNet数据集上训练10个epoch，再使用检测数据集（例如coco）进行微调。高分辨率预训练使mAP提高了大约4%。
+
+3. Convolutional With Anchor Boxes（Anchor Box替换全连接层）
+
+第一篇解读v1时提到，每个格点预测两个矩形框，在计算loss时，只让与ground truth最接近的框产生loss数值，而另一个框不做修正。这样规定之后，作者发现两个框在物体的大小、长宽比、类别上逐渐有了分工。在v2中，神经网络不对预测矩形框的宽高的绝对值进行预测，而是预测与Anchor框的偏差（offset），每个格点指定n个Anchor框。在训练时，最接近ground truth的框产生loss，其余框不产生loss。在引入Anchor Box操作后，mAP由69.5下降至69.2，原因在于，每个格点预测的物体变多之后，召回率大幅上升，准确率有所下降，总体mAP略有下降。
+
+v2中移除了v1最后的两层全连接层，全连接层计算量大，耗时久。文中没有详细描述全连接层的替换方案，这里笔者猜测是利用1*1的卷积层代替（欢迎指正），具体的网络结构原文中没有提及，官方代码也被yolo v3替代了。v2主要是各种trick引入后的效果验证，建议不必纠结于v2的网络结构。
+
+4. Dimension Clusters（Anchor Box的宽高由聚类产生）
+
+​        这里算是作者的一个创新点。Faster R-CNN中的九个Anchor Box的宽高是事先设定好的比例大小，一共设定三个面积大小的矩形框，每个矩形框有三个宽高比：1:1，2:1，1:2，总共九个框。而在v2中，Anchor Box的宽高不经过人为获得，而是将训练数据集中的矩形框全部拿出来，用kmeans聚类得到先验框的宽和高。例如使用5个Anchor Box，那么kmeans聚类的类别中心个数设置为5。加入了聚类操作之后，引入Anchor Box之后，mAP上升。
+
+​        需要强调的是，聚类必须要定义聚类点（矩形框（w，h））之间的距离函数，文中使用如下函数：
+
+<img src="img/017_object_detection_yolov2_0.png" alt="image-20250216141122681" />
+
+​         使用（1-IOU）数值作为两个矩形框的的距离函数，这里的运用也是非常的巧妙。
+
+5. Direct location prediction（绝对位置预测）
+
+Yolo中的位置预测方法很清晰，就是相对于左上角的格点坐标预测偏移量。这里的Direct具体含义，应该是和其他算法框架对比后得到的。比如其他流行的位置预测公式如下（原文中是减号，应该是加号，无伤大雅）：
+
+<img src="img/017_object_detection_yolov2_1.png" alt="image-20250216141210059" />
+
+在yolov1中
+
+<img src="img/017_object_detection_yolov2_2.png" alt="image-20250216141303755" />
+
+​        神经网络预测 tx，ty而tx，ty又需要与先验框的宽高相乘才能得到相较于 xa ，ya的位置偏移值，在v2中，位置预测公式如下：
+
+<img src="img/018_object_detection_yolov2_3.png" alt="image-20250216141334829" />
+
+<img src="img/018_object_detection_yolov2_4.png" alt="image-20250216141357271" />
+
+​        Yolo的天然优势，就是格点的坐标可以作为参照点。此时tx，ty通过一个激活函数，直接产生偏移位置数值，与矩形框的宽高独立开，变得更加直接。
+
+6. Fine-Grained Features（细粒度特征）
+
+​        在26**26的特征图，经过卷积层等，变为13*13的特征图后，作者认为损失了很多细粒度的特征，导致小尺寸物体的识别效果不佳，所以在此加入了passthrough层。
+
+<img src="img/018_object_detection_yolov2_5.png" alt="image-20250216141452951" />
+
+​        如上图所示，passthrough层就是将26*26*1的特征图，变成13*13*4的特征图，在这一次操作中不损失细粒度特征。有人说passthrough层分成四份的具体细节，并不是两刀切成4块，而是在每个2*2的小区域上都选择左上角块。其实这里怎么切都一样，在之后1*1卷积层中，不过是加法交换律的事。
+
+7. Multi-Scale Training（多尺寸训练）
+
+​        很关键的一点是，Yolo v2中只有卷积层与池化层，所以对于网络的输入大小，并没有限制，整个网络的降采样倍数为32，只要输入的特征图尺寸为32的倍数即可，如果网络中有全连接层，就不是这样了。所以Yolo v2可以使用不同尺寸的输入图片训练。
+
+​        作者使用的训练方法是，在每10个batch之后，就将图片resize成{320, 352, ..., 608}中的一种。不同的输入，最后产生的格点数不同，比如输入图片是320*320，那么输出格点是10*10，如果每个格点的先验框个数设置为5，那么总共输出500个预测结果；如果输入图片大小是608*608，输出格点就是19*19，共1805个预测结果。
+
+​         在引入了多尺寸训练方法后，迫使卷积核学习不同比例大小尺寸的特征。当输入设置为544*544甚至更大，Yolo v2的mAP已经超过了其他的物体检测算法。
+
+**Faster——Darknet-19**
+
+<img src="img/018_object_detection_yolov2_6.png" alt="image-20250216141606634" />
+
+​        v2中作者提出了新的分类网络架构——Darknet-19，该架构的网络参数较VGG-16更少，在ImageNet上，仍然可以达到top-1 72.9%以及top-5 91.2%的精度。
+
+<img src="img/018_object_detection_yolov2_7.png" alt="image-20250216141638393" />
+
+<img src="img/018_object_detection_yolov2_8.png" alt="image-20250216141656874" />
+
+​																			Yolo v2精度对比(on COCO test-dev2015)
+
+<img src="img/018_object_detection_yolov2_9.png" alt="image-20250216141756787" />
+
+​																				Yolo v2精度与速率对比（on PASCAL VOC）
+
+**Yolo9000: Stronger**
+
+- Joint classification and detection
+
+如果说整个Yolo v2的Better部分，都没有什么大的创新点，这里的分类与检测联合训练，就是Yolo v2的一大亮点，因为这一个技巧，Yolo v2才成为了Yolo9000。
+
+- Dataset combination with WordTree
+
+在文中，作者使用WordTree，解决了ImageNet与coco之间的类别问题。
+
+<img src="img/018_object_detection_yolov2_10.png" alt="image-20250216141929182" />
+
+Yolov2的wordtree：[YOLO V2 / 9000: Better, Faster, Stronger 深入理解_目睹闰土刺猹的瓜的博客-CSDN博客](https://blog.csdn.net/weixin_44585583/article/details/103098706)
+
+**小结**
+
+ 		Yolo v2将同期业界的很多深度学习技巧结合进来，将Yolo的性能与精度又提升了一个层次。Yolo9000的物体检测分类技巧，可以很好的被运用到工程中，并不需要对所有的物体都进行费时费力的检测标注，而是同时利用分类标签与检测标签达到同样的效果，从而减轻了标注成本与时间。
+
+**YOLOv2损失函数**
+
+<img src="img/018_object_detection_yolov2_11.png" alt="image-20250216142029729" />
+
+## Yolov3
+
+**这里注意bounding box 与anchor box的区别：**
+Bounding box它输出的是框的位置（中心坐标与宽高），confidence以及N个类别。
+anchor box只是一个尺度即只有宽高。
+
+**Darknet-53 模型结构**
+
+YOLO V2的darknet-19（特征提取网络）在YOLO V3中变成了darknet-53
+
+YOLO V3也借鉴了FPN层的结构
+
+使用了多级检测（multi-level detection），分别检测大目标和小目标。
