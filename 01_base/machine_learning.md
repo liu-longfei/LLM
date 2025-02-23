@@ -346,3 +346,39 @@ ROC（Receiver Operating Characteristic）曲线是以假正率（FP_rate）和�
 结论：一般使用Adam，搞不动的时候采用动量法+SGD，手动调学习率，效果最好。
 
 # 权重初始化
+
+<img src="machine_learning/012_weight_init_0.png" alt="image-20250223123747254"  />
+
+<img src="machine_learning/012_weight_init_1.png" alt="image-20250223123820798" />
+
+<img src="machine_learning/012_weight_init_2.png" alt="image-20250223123852066" />
+
+<img src="machine_learning/012_weight_init_3.png" alt="image-20250223123914419" />
+
+<img src="machine_learning/012_weight_init_4.png" alt="image-20250223123931752" />
+
+<img src="machine_learning/012_weight_init_5.png" alt="image-20250223123955455" />
+
+<img src="machine_learning/012_weight_init_6.png" alt="image-20250223124016272" />
+
+# 应对过拟合
+
+<img src="machine_learning/013_overfitting_0.png" alt="image-20250223124058027" />
+
+<img src="machine_learning/013_overfitting_1.png" alt="image-20250223124135009" />
+
+注意：随机失活会导致输出的值变化，所以要失活后的输出要注意和失活比率的关系。
+
+<img src="machine_learning/013_overfitting_2.png" alt="image-20250223124200452" />
+
+<img src="machine_learning/013_overfitting_3.png" alt="image-20250223124218541" />
+
+<img src="machine_learning/013_overfitting_4.png" alt="image-20250223124236894" />
+
+# 注意力机制SEblock
+
+<img src="machine_learning/013_overfitting_5.png" alt="image-20250223124307698" />
+
+# 图片锐化
+
+<img src="machine_learning/013_overfitting_6.png" alt="image-20250223124445505" />
