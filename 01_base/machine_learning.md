@@ -382,3 +382,138 @@ ROC（Receiver Operating Characteristic）曲线是以假正率（FP_rate）和�
 # 图片锐化
 
 <img src="machine_learning/013_overfitting_6.png" alt="image-20250223124445505" />
+
+<img src="machine_learning/014_img_sharp_0.png" alt="image-20250223124712163" />
+
+<img src="machine_learning/014_img_sharp_1.png" alt="image-20250223124806896" />
+
+# 语义分割
+
+<img src="machine_learning/015_semantic_segmentation_0.png" alt="image-20250223124852595" />
+
+<img src="machine_learning/015_semantic_segmentation_1.png" alt="image-20250223124956207" />
+
+<img src="machine_learning/015_semantic_segmentation_2.png" alt="image-20250223125014368" />
+
+<img src="machine_learning/015_semantic_segmentation_3.png" alt="image-20250223125032962" />
+
+# 目标检测
+
+<img src="machine_learning/016_object_detection_0.png" alt="image-20250223125106230" />
+
+<img src="machine_learning/016_object_detection_1.png" alt="image-20250223125142298" />
+
+**转置卷积  变分自编码器（VAE） 概率密度估计  极大似然函数** 
+
+机器学习的凸函数怎么和高数里面的不一样
+
+
+
+# 贝叶斯
+
+<img src="machine_learning/017_bayes_0.png" alt="image-20250223125228277" />
+
+<img src="machine_learning/017_bayes_1.png" alt="image-20250223125309698" />
+
+<img src="machine_learning/017_bayes_2.png" alt="image-20250223125330922" />
+
+<img src="machine_learning/017_bayes_3.png" alt="image-20250223125354384" />
+
+<img src="machine_learning/017_bayes_4.png" alt="image-20250223125413547" />
+
+<img src="machine_learning/017_bayes_5.png" alt="image-20250223125432737" />
+
+<img src="machine_learning/017_bayes_6.png" alt="image-20250223125450278" />
+
+<img src="machine_learning/017_bayes_7.png" alt="image-20250223125521823" />
+
+**朴素贝叶斯算法的朴素一词解释：朴素贝叶斯算法是假设各个特征之间相互独立**
+
+> 朴素贝叶斯分类的优缺点
+>
+> - 优点
+>   1. 算法逻辑简单,易于实现
+>   2. 分类过程中时空开销小
+> - 缺点
+>   1. 理论上，朴素贝叶斯模型与其他分类方法相比具有最小的误差率。但是实际上并非总是如此，这是因为朴素贝叶斯模型假设属性之间相互独立，这个假设在实际应用中往往是不成立的，在属性个数比较多或者属性之间相关性较大时，分类效果不好。
+>   2. 而在属性相关性较小时，朴素贝叶斯性能最为良好。对于这一点，有半朴素贝叶斯之类的算法通过考虑部分关联性适度改进。
+
+# 为什么残差网络性能这么好？
+
+一种典型的解释：残差网络可以看做是一种集成模型。
+
+# GoogleLeNet辅助分类器
+
+GoogLeNet用到了辅助分类器。Inception Net一共有22层，除了最后一层的输出结果，中间节点的分类效果也有可能是很好的，所以GoogLeNet将中间某一层的输出作为分类，并以一个较小的权重（0.3）加到最终的分类结果中。一共有2个这样的辅助分类节点。
+
+# 对抗网络
+
+<img src="machine_learning/018_gan_0.png" alt="image-20250223125831750" />
+
+<img src="machine_learning/018_gan_1.png" alt="image-20250223125856691" />
+
+<img src="machine_learning/018_gan_2.png" alt="image-20250223125915586" />
+
+# 转置卷积
+
+<img src="machine_learning/019_transpose_convolution_0.png" alt="image-20250223125945332" />
+
+# K-means 的算法步骤为：
+
+K-means 的算法步骤为：
+
+1. 选择初始化的 k 个样本作为初始聚类中心a=a1,a2,a3...ak;
+2. 针对数据集中每个样本xi计算它到 k 个聚类中心的距离并将其分到距离最小的聚类中心所对应的类中；
+3. 针对每个类别aj,重新计算它的聚类中心
+
+<img src="machine_learning/020_k-means_0.png" alt="image-20250223130107735" />
+
+4. 重复上面 2和 3 两步操作，直到达到某个中止条件（迭代次数、最小误差变化等）。
+
+# kNN
+
+工作原理：存在一个样本数据集合，也称作训练样本集，并且样本集中每个数据都存在标签，即我们知道样本集中每一数据与所属分类的对应关系。输入没有标签的新数据后，将新数据的每个特征与样本集中数据对应的特征进行比较，然后算法提取样本集中特征最相似数据（最近邻）的分类标签。一般来说，我们只选择样本数据集中前**k**个最相似的数据，这就是**k**-近邻算法中**k**的出处，通常**k**是不大于20的整数。最后，选择**k**个最相似数据中出现次数最多的分类，作为新数据的分类。
+
+# 决策树
+
+## 1、信息增益
+
+​		熵定义为信息的期望值，在明晰这个概念之前，我们必须知道信息的定义。如果待分类的事务可能划分在多个分类之中，则符号xi的信息定义为
+
+<img src="machine_learning/021_decision_tree_0.png" alt="image-20250223130253408" />
+
+中p(xi)是选择该分类的概率。
+
+​		为了计算熵，我们需要计算所有类别所有可能值包含的信息期望值，通过下面的公式得到：
+
+<img src="machine_learning/021_decision_tree_1.png" alt="image-20250223130356851" />
+
+其中n是分类的数目。
+
+信息增益=原数据的信息熵-所有子数据集信息熵的和（按照某种特征划分的子数据集）。
+
+信息增益越大表示使用这个特征来划分所获得的“纯度提升越大”。
+
+## 2、划分子数据集
+
+根据信息增益最大的那个特征划分数据集。
+
+## 3、构建算法步骤：
+
+​		原始数据集，然后基于最好的属性值划分数据集，由于特征值可能多于两个，因此可能存在大于两个分支的数据集划分。第一次划分之后，数据将被向下传递到树分支的下一个节点，在这个节点上，我们可以再次划分数据。因此我们可以采用递归的原则处理数据集。
+
+​		递归结束的条件是：程序遍历完所有划分数据集的属性，或者每个分支下的所有实例都具有相同的分类。如果所有实例具有相同的分类，则得到一个叶子节点或者终止块。任何到达叶子节点的数据必然属于叶子节点的分类。
+
+​		第一个结束条件使得算法可以终止，我们甚至可以设置算法可以划分的最大分组数目。后续章节还会介绍其他决策树算法，如C4.5和CART，这些算法在运行时并不总是在每次划分分组时都会消耗特征。由于特征数目并不是在每次划分数据分组时都减少，因此这些算法在实际使用时可能引起一定的问题。目前我们并不需要考虑这个问题，只需要在算法开始运行前计算列的数目，查看算法是否使用了所有属性即可。如果数据集已经处理了所有属性，但是类标签依然不是唯一的，此时我们需要决定如何定义该叶子节点，在这种情况下，我们通常会采用多数表决的方法决定该叶子节点的分类。
+
+# PCA
+
+<img src="machine_learning/022_pca_0.png" alt="image-20250223130600488" />
+
+<img src="machine_learning/022_pca_1.png" alt="image-20250223130628540" />
+
+<img src="machine_learning/022_pca_2.png" alt="image-20250223130646362" />
+
+计算相关性和卷积、空洞卷积、高斯分布、协方差矩阵、似然估计
+
+# Vit
