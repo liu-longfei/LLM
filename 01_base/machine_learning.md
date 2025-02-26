@@ -517,3 +517,233 @@ K-means 的算法步骤为：
 计算相关性和卷积、空洞卷积、高斯分布、协方差矩阵、似然估计
 
 # Vit
+
+<img src="machine_learning/023_vit_0.png" alt="image-20250226215333546" />
+
+<img src="machine_learning/023_vit_1.png" alt="image-20250226215407883" />
+
+# 支持向量机（SVM）
+
+下面是李航的《统计学习方法》中对于核函数的定义：
+
+<img src="machine_learning/023_vit_2.png" alt="image-20250226215451697" />
+
+要注意，核函数和映射没有关系。核函数只是用来计算映射到高维空间之后的内积的一种简便方法。
+
+支持向量机（support vector machines）是一种二分类模型，它的目的是寻找一个超平面来对样本进行分割，分割的原则是间隔最大化，最终转化为一个凸二次规划问题来求解。由简至繁的模型包括：
+
+1. 当训练样本线性可分时，通过硬间隔最大化，学习一个线性可分支持向量机；
+
+2. 当训练样本近似线性可分时，通过软间隔最大化，学习一个线性支持向量机；
+
+3. 当训练样本线性不可分时，通过核技巧和软间隔最大化，学习一个非线性支持向量机；
+
+<img src="machine_learning/024_svm_0.png" alt="image-20250226215541870" />
+
+<img src="machine_learning/024_svm_1.png" alt="image-20250226215605534" />
+
+<img src="machine_learning/024_svm_2.png" alt="image-20250226215703876" />
+
+<img src="machine_learning/024_svm_3.png" alt="image-20250226215724615" />
+
+# AdaBoost
+
+<img src="machine_learning/025_Adaboost_0.png" alt="image-20250226215755132" />
+
+<img src="machine_learning/025_Adaboost_1.png" alt="image-20250226215829536" />
+
+<img src="machine_learning/025_Adaboost_2.png" alt="image-20250226215848236" />
+
+<img src="machine_learning/025_Adaboost_3.png" alt="image-20250226215907529" />
+
+<img src="machine_learning/025_Adaboost_4.png" alt="image-20250226215942077" />
+
+<img src="machine_learning/025_Adaboost_5.png" alt="image-20250226220003025" />
+
+<img src="machine_learning/025_Adaboost_6.png" alt="image-20250226220024743" />
+
+<img src="machine_learning/025_Adaboost_7.png" alt="image-20250226220051816" />
+
+<img src="machine_learning/025_Adaboost_8.png" alt="image-20250226220110069" />
+
+说明：
+
+I(a!=b).a!=b的时候，I(\*)=1. a=b的时候，I(*)=0.
+
+<img src="machine_learning/025_Adaboost_9.png" alt="image-20250226220216790" />
+
+核函数、协方差
+
+# 集成学习
+
+​		常见的集成学习框架有三种：Bagging，Boosting 和 Stacking。三种集成学习框架在基学习器的产生和综合结果的方式上会有些区别，我们先做些简单的介绍。
+
+## 1、Bagging
+
+​		Bagging 全称叫 Bootstrap aggregating，看到 Bootstrap 我们立刻想到著名的开源前端框架（抖个机灵，是 Bootstrap 抽样方法） ，每个基学习器都会对训练集进行有放回抽样得到子训练集，比较著名的采样法为 0.632 自助法。每个基学习器基于不同子训练集进行训练，并综合所有基学习器的预测值得到最终的预测结果。Bagging 常用的综合方法是投票法，票数最多的类别为预测类别。
+
+<img src="machine_learning/026_bagging_0.png" alt="image-20250226220345350" />
+
+## 2、Boosting
+
+​		Boosting 训练过程为阶梯状，基模型的训练是有顺序的，每个基模型都会在前一个基模型学习的基础上进行学习，最终综合所有基模型的预测值产生最终的预测结果，用的比较多的综合方式为加权法。
+
+<img src="machine_learning/026_bagging_1.png" alt="image-20250226220524183"  />
+
+## 3、Stacking
+
+​		Stacking 是先用全部数据训练好基模型，然后每个基模型都对每个训练样本进行的预测，其预测值将作为训练样本的特征值，最终会得到新的训练样本，然后基于新的训练样本进行训练得到模型，然后得到最终预测结果。
+
+<img src="machine_learning/026_stacking_2.png" alt="image-20250226220625077" />
+
+那么，为什么集成学习会好于单个学习器呢？原因可能有三：
+
+（1）训练样本可能无法选择出最好的单个学习器，由于没法选择出最好的学习器，所以干脆结合起来一起用；
+
+（2）假设能找到最好的学习器，但由于算法运算的限制无法找到最优解，只能找到次优解，采用集成学习可以弥补算法的不足；
+
+（3）可能算法无法得到最优解，而集成学习能够得到近似解。比如说最优解是一条对角线，而单个决策树得到的结果只能是平行于坐标轴的，但是集成学习可以去拟合这条对角线。
+
+# 随机森林
+
+​		Random Forest（随机森林）是 Bagging 的扩展变体，它在以决策树为基学习器构建 Bagging 集成的基础上，进一步在决策树的训练过程中引入了随机特征选择，因此可以概括 RF 包括四个部分：
+
+1. 随机选择样本（放回抽样）；
+2. 随机选择特征；
+3. 构建决策树；
+4. 随机森林投票（平均）。 
+
+​		随机选择样本和 Bagging 相同，采用的是 Bootstrap 自助采样法；随机选择特征是指在每个节点在分裂过程中都是随机选择特征的（区别与每棵树随机选择一批特征）。
+
+​		这种随机性导致随机森林的偏差会有稍微的增加（相比于单棵不随机树），但是由于随机森林的“平均”特性，会使得它的方差减小，而且方差的减小补偿 了偏差的增大，因此总体而言是更好的模型。
+
+​		随机采样由于引入了两种采样方法保证了随机性，所以每棵树都是最大可能的进行生长就算不剪枝也不会出现过拟合。
+
+# 标签平滑
+
+​		标签平滑是一种损失函数的修正，已被证明是非常有效的训练深度学习网络的方法。标签平滑提高了图像分类、翻译甚至语音识别的准确性。
+
+​		简单的解释是， 目标从“1”调整为“1-label smoothing adjustment”，这意味着神经网络被训练得对自己的答案不那么自信。默认值通常是 0.1，这意味着目标答案是 0.9(1 - 0.1)而不是 1。
+
+​		例如:假设我们要将图像分类为狗和猫。如果我们看到一张狗的照片，我们训练CNN(通过交叉熵损失)向 1 表示狗，0 表示猫的方向移动。如果是一只猫，我们训练的方向正好相反，1 代表猫，0 代表狗。换句话说，这是一个 binary 或者说“hard”的答案。
+
+​		然而，CNN 有一个坏习惯，就是在训练过程中对预测变得“过于自信”，这可能会降低它们的泛化能力，从而在新的、看不见的未来数据上表现得同样出色。此外，大型数据集通常会包含标签错误的数据，这意味着神经网络在本质上应该对“正确答案”持怀疑态度，以减少一定程度上围绕错误答案的极端情况下的建模。
+
+​		对于我们的二分类猫/狗示例，0.1 的标签平滑意味着目标答案将是 0.90(90%确信)这是一个狗的图像，而 0.10(10%确信)这是一只猫，而不是先前的向 1 或 0 移动的结果。由于不太确定，它作为一种正则化形式，提高了它对新数据的预测能力。
+
+**知识蒸馏(什么时候不使用标签平滑)：**
+
+​		论文的最后一部分讨论了这样一个发现，即尽管标签平滑可以产生用于各种任务的改进的神经网络……如果最终的模型将作为其他“学生”网络的老师，那么它不应该被使用。
+
+​		作者注意到，尽管使用标签平滑化训练提高了教师的最终准确性，但与使用“硬”目标训练的教师相比，它未能向学生网络传递足够多的知识(没有标签平滑化)。
+
+<img src="machine_learning/027_label_smoothing_0.png" alt="image-20250226220920259" />
+
+​		标签平滑“擦除”了在hard目标训练中保留的一些细节。这样的泛化有利于教师网络的性能，但是它传递给学生网络的信息更少。
+
+​		标签平滑产生的模型是不好的教师模型的原因可以通过初始的可视化或多或少的表现出来。通过强制将最终的分类划分为更紧密的集群，该网络删除了更多的细节，将重点放在类之间的核心区别上。
+
+​		这种“舍入”有助于网络更好地处理不可见数据。然而，丢失的信息最终会对它教授新学生模型的能力产生负面影响。
+
+​		因此，准确性更高的老师并不能更好地向学生提炼信息。
+
+==========================
+
+​		标签平滑后的分布就相当于往真实分布中加入了噪声，避免模型对于正确标签过于自信，使得预测正负样本的输出值差别不那么大，从而避免过拟合，提高模型的泛化能力。
+
+​		NIPS 2019上的这篇论文When Does Label Smoothing Help?用实验说明了为什么Label smoothing可以work，指出标签平滑可以让分类之间的cluster更加紧凑，增加类间距离，减少类内距离，提高泛化性，同时还能提高Model Calibration（模型对于预测值的confidences和accuracies之间aligned的程度）。但是在模型蒸馏中使用Label smoothing会导致性能下降。
+
+# 知识蒸馏
+
+<img src="machine_learning/028_knowledge_distillation_0.png" alt="image-20250226221036214" />
+
+<img src="machine_learning/028_knowledge_distillation_1.png" alt="image-20250226221120199" />
+
+<img src="machine_learning/028_knowledge_distillation_2.png" alt="image-20250226221138522" />
+
+<img src="machine_learning/028_knowledge_distillation_3.png" alt="image-20250226221158076" />
+
+<img src="machine_learning/028_knowledge_distillation_4.png" alt="image-20250226221218490" />
+
+<img src="machine_learning/028_knowledge_distillation_5.png" alt="image-20250226221238433" />
+
+<img src="machine_learning/028_knowledge_distillation_6.png" alt="image-20250226221302320" />
+
+# 轻量级神经网络
+
+<img src="machine_learning/029_small_network_0.png" alt="image-20250226221332923" />
+
+# 排序算法
+
+```python
+list_2 = [3, 2, 9, 10, 5]
+
+
+def bubble_sort(list_1):
+    for i in range(len(list_1) - 1):
+        for j in range(len(list_1) - i - 1):
+            if list_1[j] < list_1[j+1]:
+                list_1[j], list_1[j+1] = list_1[j+1], list_1[j]
+    return list_1
+
+
+def select_sort(list_1):
+    for i in range(len(list_1)):
+        for j in range(i + 1, len(list_1)):
+            if list_1[i] > list_1[j]:
+                list_1[i], list_1[j] = list_1[j], list_1[i]
+            print(list_1)
+    return list_1
+
+
+def insert_sort(list):
+    for i in range(1, len(list)):
+        index = i
+        while list[index-1] > list[index] and index - 1 >= 0:
+            list[index-1], list[index] = list[index], list[index-1]
+            index -= 1
+    return list
+
+
+def quick_sort_1(list):
+    if len(list) < 2:
+        return list
+    else:
+        temp = list[0]
+        less = [i for i in list[1:] if temp > i]
+        great = [i for i in list[1:] if temp < i]
+    return quick_sort_1(less) + [temp] + quick_sort_1(great)
+
+
+def quick_sort(nums, left, right):
+    if left < right:
+        i = left
+        j = right
+        # 取第一个元素为枢轴量
+        pivot = nums[left]
+        while i != j:
+            # 交替扫描和交换
+            # 从右往左找到第一个比枢轴量小的元素，交换位置
+            while j > i and nums[j] > pivot:
+                j -= 1
+            if j > i:
+                # 如果找到了，进行元素交换
+                nums[i] = nums[j]
+                i += 1
+            # 从左往右找到第一个比枢轴量大的元素，交换位置
+            while i < j and nums[i] < pivot:
+                i += 1
+            if i < j:
+                nums[j] = nums[i]
+                j -= 1
+        # 至此完成一趟快速排序，枢轴量的位置已经确定好了，就在i位置上（i和j)值相等
+        nums[i] = pivot
+        # 以i为枢轴进行子序列元素交换
+        quick_sort(nums, left, i-1)
+        quick_sort(nums, i+1, right)
+    return nums
+
+
+print(quick_sort(list_2, 0, len(list_2) - 1))
+```
+
