@@ -162,3 +162,11 @@ class RMSNorm(torch.nn.Module):
         return output * self.weight
 ```
 
+
+
+# 旋转位置编码（RoPE）
+
+> 参考链接：[解密旋转位置编码：数学基础、代码实现与绝对编码一体化探索_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Xi421R7ev/?spm_id_from=333.337.search-card.all.click&vd_source=fffd0a55d832fc312ff82010c51836f8)
+>
+> 参考博客：[解密旋转位置编码 - 连义江的博客](https://skylyj.github.io/positional_embedding/)
+
