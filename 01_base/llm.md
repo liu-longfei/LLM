@@ -170,3 +170,8 @@ class RMSNorm(torch.nn.Module):
 >
 > 参考博客：[解密旋转位置编码 - 连义江的博客](https://skylyj.github.io/positional_embedding/)
 
+
+
+# PPO
+
+![img](llm/002_ppo_0.jpg)
