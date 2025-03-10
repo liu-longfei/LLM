@@ -174,4 +174,20 @@ class RMSNorm(torch.nn.Module):
 
 # PPO
 
+​	RLHF技术 OpenAI正式公开资料来源于论文《Training language models to follow instructions with human feedback》，核心包含3个步骤：
+
+- 训练获取SFT模型
+
+- 训练获取RM模型
+
+- PPO训练获取最终的微调模型
+
 ![img](llm/002_ppo_0.jpg)
+
+# MHA，MQA，MHA
+
+![image-20250309170517367](llm/003_MHA-MQA-GQA_0.png)
+
+# MLA
+
+![img](llm/004_MLA_0.png)
