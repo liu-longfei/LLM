@@ -184,10 +184,13 @@ class RMSNorm(torch.nn.Module):
 
 ![img](llm/002_ppo_0.jpg)
 
-# MHA，MQA，MHA
+# MHA，GQA，MQA
 
 ![image-20250309170517367](llm/003_MHA-MQA-GQA_0.png)
 
 # MLA
 
 ![img](llm/004_MLA_0.png)
+
+
+
