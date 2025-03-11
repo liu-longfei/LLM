@@ -1,4 +1,4 @@
-
+```python
 import torch
 import torch.nn as nn
 
@@ -32,7 +32,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
+```
 class MultiHeadAttention(nn.Module):
     def __init__(self, embed_dim, num_heads, dropout_prob=0.1):
         super(MultiHeadAttention, self).__init__()
