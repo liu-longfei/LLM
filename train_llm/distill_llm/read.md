@@ -38,7 +38,7 @@ KL散度表示表示两个分布的距离。训练模型（Policy）和参考模
 > 
 >     per_token_kl = torch.exp(ref_per_token_logps - per_token_logps) - (ref_per_token_logps - per_token_logps) - 1
 > 
-> * $\frac{x}{y} $ = $e^{log\frac{x}{y}}$ = $e^{logx - logy}$
+> * $ \frac{x}{y} $ = $e^{log\frac{x}{y}}$ = $e^{logx - logy}$
 >   
 > * $log\frac{x}{y}$ = $logx$ - $logy$
 >   
