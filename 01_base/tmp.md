@@ -32,7 +32,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-```
+
 class MultiHeadAttention(nn.Module):
     def __init__(self, embed_dim, num_heads, dropout_prob=0.1):
         super(MultiHeadAttention, self).__init__()
@@ -106,3 +106,5 @@ output = multihead_attn(x, attention_mask)
 print(f"输入形状: {x.shape}")
 print(f"注意力掩码形状: {attention_mask.shape}")
 print(f"输出形状: {output.shape}")
+
+```
