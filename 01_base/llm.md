@@ -194,3 +194,11 @@ class RMSNorm(torch.nn.Module):
 
 
 
+# 如何提升RAG的召回质量
+
+1. 使用rerank模型
+
+2. 混合检索
+3. Small to Big
+4. CRAG
+5. Self-RAG
