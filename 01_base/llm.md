@@ -306,3 +306,33 @@ Re-Ranking的过程可以分为以下几个步骤：
 
 1. CRAG
 2. Self-RAG
+
+# 模型量化
+
+## QLoRA
+
+**huggingface官方代码**
+
+<img src="llm/006_QLoRA_0.png" alt="image-20250320080932712" />
+
+思想：卷积神经网络的参数值是服从正态分布的，分布在0值附近的参数比较多，极大和极小值比较少。所以为了减少量化带来的误差就可以在密度大的地方多分配一些量化后的整数值，少的地方少分配一些量化后的整数值。（正态分布概率密度等分）
+
+<img src="llm/006_QLoRA_1.png" alt="image-20250320081450036" />
+
+正态分布概率密度等分代码实现：
+
+<img src="llm/006_QLoRA_2.png" alt="image-20250320081650487" />
+
+量化和反量化示例：
+
+<img src="llm/006_QLoRA_3.png" alt="image-20250320081808157" />
+
+<img src="llm/006_QLoRA_4.png" alt="image-20250320081923696" />
+
+<img src="llm/006_QLoRA_5.png" alt="image-20250320081947787" />
+
+<img src="llm/006_QLoRA_6.png" alt="image-20250320082032567" />
+
+> 上一张图片就是为了说明在代码中为什么要指明计算类型
+>
+> 参考链接：[模型量化六：QLoRA 4bit 量化 NormalFloat4 量化_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV15y411a7so?spm_id_from=333.788.videopod.sections&vd_source=fffd0a55d832fc312ff82010c51836f8)
