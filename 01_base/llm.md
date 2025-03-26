@@ -336,3 +336,13 @@ Re-Ranking的过程可以分为以下几个步骤：
 > 上一张图片就是为了说明在代码中为什么要指明计算类型
 >
 > 参考链接：[模型量化六：QLoRA 4bit 量化 NormalFloat4 量化_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV15y411a7so?spm_id_from=333.788.videopod.sections&vd_source=fffd0a55d832fc312ff82010c51836f8)
+
+# 知识图谱
+
+知识图谱是一种语义网络，由节点（实体）和边（关系）组成，用图的方式来表示知识。
+
+常见的知识图谱有两种类型：LPG和RDF。LPG更适合需要高性能图分析的场景，而RDF则更适合需要丰富语义表达和推理的应用。
+
+LPG（Labeled Property Graph）
+
+RDF（Resource Description Framword）
