@@ -346,3 +346,6 @@ Re-Ranking的过程可以分为以下几个步骤：
 LPG（Labeled Property Graph）
 
 RDF（Resource Description Framword）
+
+# Agent
+AI Agent智能体，是指一种能够模拟人类思考和行为来自动执行任务，已解决复杂问题的程序或系统
