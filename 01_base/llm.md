@@ -172,6 +172,14 @@ class RMSNorm(torch.nn.Module):
 
 
 
+# KV Cache
+
+> 参考链接：
+>
+> https://zhuanlan.zhihu.com/p/649756898
+>
+> https://zhuanlan.zhihu.com/p/662498827
+
 # PPO
 
 ​	RLHF技术 OpenAI正式公开资料来源于论文《Training language models to follow instructions with human feedback》，核心包含3个步骤：
