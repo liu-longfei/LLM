@@ -8,9 +8,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
 import torch.distributed as dist
+from contextlib import nullcontext
 
 from model.model_vlm import VLMConfig
-from trainer.train_utils import init_distributed_mode, setup_seed, vlm_checkpoint
+from trainer.train_utils import init_distributed_mode, setup_seed, vlm_checkpoint, is_main_process
 
 
 if __name__ == "__main__":
@@ -49,4 +50,20 @@ if __name__ == "__main__":
     os.makedirs(args.save_dir, exist_ok=True)
     vlm_config = VLMConfig(hidden_size=args.hidden_size, num_hidden_layers=args.num_hidden_layers, max_seq_len=args.max_seq_len, use_moe=bool(args.use_moe))
     ckp_data = vlm_checkpoint(vlm_config, weight=args.save_weight, save_dir='../checkpoints') if args.from_resume==1 else None
+    
+    # ========== 3. 设置混合精度 ==========
+    device_type = "cuda" if "cuda" in args.device else "cpu"
+    dtype = torch.bfloat16 if args.dtype == "bfloat16" else torch.float16
+    autocast_ctx = nullcontext() if device_type == "cpu" else torch.cuda.amp.autocast(dtype=dtype)
+    
+    # ========== 4. 配wandb ==========
+    wandb = None
+    if args.use_wandb and is_main_process():
+        import swanlab as wandb
+        wandb_id = ckp_data.get('wandb_id') if ckp_data else None
+        resume = 'must' if wandb_id else None
+        wandb_run_name = f"MiniMind-V-Pretrain-Epoch-{args.epochs}-BatchSize-{args.batch_size}-LearningRate-{args.learning_rate}"
+        wandb.init(project=args.wandb_project, name=wandb_run_name, id=wandb_id, resume=resume)
+
+    # ========== 5. 定义模型、数据、优化器 ==========
     

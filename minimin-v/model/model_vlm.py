@@ -10,3 +10,8 @@ class VLMConfig(MiniMindConfig):
         self.image_hidden_size = kwargs.get("image_hidden_size", 768)
         self.image_token_len = kwargs.get("image_token_len", 64)
         super().__init__(**kwargs)
+
+
+# 继承自语言模型
+class MiniMindVLM(MiniMindForCausalLM):
+    config_class = VLMConfig

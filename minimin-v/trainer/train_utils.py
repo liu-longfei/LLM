@@ -10,6 +10,7 @@ import numpy as np
 import torch
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
+from transformers import AutoTokenizer
 
 
 def is_main_process():
@@ -39,6 +40,10 @@ def setup_seed(seed: int):
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+
+
+def init_vlm_model(vlm_config, from_weight='pretrain_vlm', tokenizer_path='../model', vision_model_path='../model/siglip2-base-p16-ve', save_dir='../out', device='cuda', freeze_llm=0):
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
 
 
 def vlm_checkpoint(vlm_config, weight='pretrain_vlm', model=None, optimizer=None, epoch=0, step=0, wandb=None, save_dir='../checkpoints', **kwargs):
