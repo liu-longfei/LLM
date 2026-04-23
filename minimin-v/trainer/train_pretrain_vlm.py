@@ -9,9 +9,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import torch.distributed as dist
 from contextlib import nullcontext
-
+from torch import optim
+from torch.nn.parallel import DistributedDataParallel
+from torch.utils.data import DataLoader, DistributedSampler
 from model.model_vlm import VLMConfig
-from trainer.train_utils import init_distributed_mode, setup_seed, vlm_checkpoint, is_main_process
+from dataset.lm_dataset import VLMDataset
+from trainer.train_utils import init_distributed_mode, setup_seed, vlm_checkpoint, is_main_process, init_vlm_model, Logger
 
 
 if __name__ == "__main__":
@@ -66,4 +69,30 @@ if __name__ == "__main__":
         wandb.init(project=args.wandb_project, name=wandb_run_name, id=wandb_id, resume=resume)
 
     # ========== 5. 定义模型、数据、优化器 ==========
+    model, tokenizer, preprocess = init_vlm_model(vlm_config, from_weight=args.from_weight, device=args.device, freeze_llm=args.freeze_llm)
+    train_ds = VLMDataset(args.data_path, tokenizer, preprocess=preprocess, image_special_token=vlm_config.image_special_token, image_token_len=vlm_config.image_token_len, max_length=vlm_config.max_seq_len)
+    train_sampler = DistributedSampler(train_ds) if dist.is_initialized() else None
+    scaler = torch.cuda.amp.GradScaler(enabled=(args.dtype == 'float16'))
+    optimizer = optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=args.learning_rate)
     
+    # ========== 6. 从ckp恢复状态 ==========
+    start_epoch, start_step = 0, 0
+    if ckp_data:
+        model.load_state_dict(ckp_data['model'], strict=False)
+        optimizer.load_state_dict(ckp_data['optimizer'])
+        scaler.load_state_dict(ckp_data['scaler'])
+        start_epoch = ckp_data['epoch']
+        start_step = ckp_data.get('step', 0)
+
+    # ========== 7. 编译和分布式包装 ==========
+    if args.use_compile == 1:
+        model = torch.compile(model)
+        Logger('torch.compile enabled')
+    if dist.is_initialized():
+        model._ddp_params_and_buffers_to_ignore = {"freqs_cos", "freqs_sin"}
+        model = DistributedDataParallel(model, device_ids=[local_rank])
+
+    # ========== 8. 开始训练 ==========
+    for epoch in range(start_epoch, args.epochs):
+        train_sampler and train_sampler.set_epoch(epoch)
+        # 这次更新到这
