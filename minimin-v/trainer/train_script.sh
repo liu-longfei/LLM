@@ -1,0 +1,2 @@
+python train_pretrain_vlm.py --save_dir "/home/user/ubuntu/code/LLM/minimin-v/outs" --epochs 4 --from_weight llm \
+--from_weight none --data_path /home/user/ubuntu/code/minimind-v/dataset/pretrain_i2t.parquet

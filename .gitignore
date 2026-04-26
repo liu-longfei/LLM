@@ -1,3 +1,5 @@
 .idea
 **/output**
 *.log
+# 忽略所有 Python 缓存文件夹
+__pycache__/

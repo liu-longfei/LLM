@@ -1,24 +1,84 @@
-import torch
-import argparse
 import os
 import sys
 
-__package__ = 'trainer'
+__package__ = "trainer"
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-
+import argparse
+import time
+import warnings
+import torch
 import torch.distributed as dist
 from contextlib import nullcontext
-from torch import optim
+from torch import optim, nn
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader, DistributedSampler
-from model.model_vlm import VLMConfig
+from transformers import AutoTokenizer
+from model.model_vlm import MiniMindVLM, VLMConfig
 from dataset.lm_dataset import VLMDataset
-from trainer.train_utils import init_distributed_mode, setup_seed, vlm_checkpoint, is_main_process, init_vlm_model, Logger
+from trainer.trainer_utils import get_lr, Logger, is_main_process, init_distributed_mode, setup_seed, init_vlm_model, vlm_checkpoint, SkipBatchSampler, vlm_collate_fn
+
+warnings.filterwarnings('ignore')
+
+
+def train_epoch(epoch, loader, iters, start_step=0, wandb=None):
+    start_time = time.time()
+    for step, (input_ids, labels, pixel_values) in enumerate(loader, start=start_step + 1):
+        input_ids = input_ids.to(args.device)
+        labels = labels.to(args.device)
+        pixel_values = {k: v.to(args.device) for k, v in pixel_values.items()} if isinstance(pixel_values, dict) else pixel_values.to(args.device)
+        lr = get_lr(epoch * iters + step, args.epochs * iters, args.learning_rate)
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
+
+        with autocast_ctx:
+            res = model(input_ids, labels=labels, pixel_values=pixel_values)
+            loss = res.loss + res.aux_loss
+            loss = loss / args.accumulation_steps
+
+        scaler.scale(loss).backward()
+
+        if (step + 1) % args.accumulation_steps == 0:
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
+
+            scaler.step(optimizer)
+            scaler.update()
+
+            optimizer.zero_grad(set_to_none=True)
+
+        if step % args.log_interval == 0 or step == iters - 1:
+            spend_time = time.time() - start_time
+            current_loss = loss.item() * args.accumulation_steps
+            current_aux_loss = res.aux_loss.item() if res.aux_loss is not None else 0.0
+            current_logits_loss = current_loss - current_aux_loss
+            current_lr = optimizer.param_groups[-1]['lr']
+            eta_min = spend_time / (step + 1) * iters // 60 - spend_time // 60
+            Logger(f'Epoch:[{epoch + 1}/{args.epochs}]({step}/{iters}), loss: {current_loss:.4f}, logits_loss: {current_logits_loss:.4f}, aux_loss: {current_aux_loss:.4f}, lr: {current_lr:.8f}, epoch_time: {eta_min:.1f}min')
+            if wandb: wandb.log({"loss": current_loss, "logits_loss": current_logits_loss, "aux_loss": current_aux_loss, "learning_rate": current_lr, "epoch_time": eta_min})
+
+        if (step % args.save_interval == 0 or step == iters - 1) and is_main_process():
+            model.eval()
+            moe_suffix = '_moe' if vlm_config.use_moe else ''
+            ckp = f'{args.save_dir}/{args.save_weight}_{vlm_config.hidden_size}{moe_suffix}.pth'
+            raw_model = model.module if isinstance(model, DistributedDataParallel) else model
+            raw_model = getattr(raw_model, '_orig_mod', raw_model)
+            state_dict = raw_model.state_dict()
+            clean_state_dict = {
+                key: value for key, value in state_dict.items() if not key.startswith('vision_encoder.')
+            }
+            clean_state_dict = {k: v.half().cpu() for k, v in clean_state_dict.items()}  # 半精度保存并移到CPU
+            torch.save(clean_state_dict, ckp)
+            vlm_checkpoint(vlm_config, weight=args.save_weight, model=model, optimizer=optimizer, 
+                         epoch=epoch, step=step, wandb=wandb, save_dir='../checkpoints', scaler=scaler)
+            model.train()
+            del state_dict, clean_state_dict
+
+        del input_ids, labels, pixel_values, res, loss
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='MiniMind-v Pretrain')
+    parser = argparse.ArgumentParser(description="MiniMind-V Pretrain")
     parser.add_argument("--save_dir", type=str, default="../out", help="模型保存目录")
     parser.add_argument('--save_weight', default='pretrain_vlm', type=str, help="保存权重的前缀名")
     parser.add_argument("--epochs", type=int, default=3, help="训练轮数")
@@ -67,7 +127,7 @@ if __name__ == "__main__":
         resume = 'must' if wandb_id else None
         wandb_run_name = f"MiniMind-V-Pretrain-Epoch-{args.epochs}-BatchSize-{args.batch_size}-LearningRate-{args.learning_rate}"
         wandb.init(project=args.wandb_project, name=wandb_run_name, id=wandb_id, resume=resume)
-
+    
     # ========== 5. 定义模型、数据、优化器 ==========
     model, tokenizer, preprocess = init_vlm_model(vlm_config, from_weight=args.from_weight, device=args.device, freeze_llm=args.freeze_llm)
     train_ds = VLMDataset(args.data_path, tokenizer, preprocess=preprocess, image_special_token=vlm_config.image_special_token, image_token_len=vlm_config.image_token_len, max_length=vlm_config.max_seq_len)
@@ -83,7 +143,7 @@ if __name__ == "__main__":
         scaler.load_state_dict(ckp_data['scaler'])
         start_epoch = ckp_data['epoch']
         start_step = ckp_data.get('step', 0)
-
+    
     # ========== 7. 编译和分布式包装 ==========
     if args.use_compile == 1:
         model = torch.compile(model)
@@ -91,8 +151,19 @@ if __name__ == "__main__":
     if dist.is_initialized():
         model._ddp_params_and_buffers_to_ignore = {"freqs_cos", "freqs_sin"}
         model = DistributedDataParallel(model, device_ids=[local_rank])
-
+    
     # ========== 8. 开始训练 ==========
     for epoch in range(start_epoch, args.epochs):
         train_sampler and train_sampler.set_epoch(epoch)
-        # 这次更新到这
+        setup_seed(42 + epoch); indices = torch.randperm(len(train_ds)).tolist()
+        skip = start_step if (epoch == start_epoch and start_step > 0) else 0
+        batch_sampler = SkipBatchSampler(train_sampler or indices, args.batch_size, skip)
+        loader = DataLoader(train_ds, batch_sampler=batch_sampler, num_workers=args.num_workers, pin_memory=True, collate_fn=vlm_collate_fn)
+        if skip > 0: 
+            Logger(f'Epoch [{epoch + 1}/{args.epochs}]: 跳过前{start_step}个step，从step {start_step + 1}开始')
+            train_epoch(epoch, loader, len(loader) + skip, start_step, wandb)
+        else:
+            train_epoch(epoch, loader, len(loader), 0, wandb)
+    
+    # ========== 9. 清理分布进程 ==========
+    if dist.is_initialized(): dist.destroy_process_group()
