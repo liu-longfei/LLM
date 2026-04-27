@@ -64,7 +64,9 @@ def setup_seed(seed: int):
 
 
 def init_vlm_model(vlm_config, from_weight='pretrain_vlm', tokenizer_path='../model', vision_model_path='../model/siglip2-base-p16-ve', save_dir='../out', device='cuda', freeze_llm=0):
+    tokenizer_path = '/home/user/ubuntu/code/minimind-v/model'
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+    vision_model_path = '/home/user/ubuntu/code/minimind-v/model/siglip2-base-p16-ve'
     model = MiniMindVLM(vlm_config, vision_model_path=vision_model_path)
     
     if from_weight != 'none':

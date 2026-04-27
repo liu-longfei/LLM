@@ -62,7 +62,6 @@ class MiniMindVLM(MiniMindForCausalLM):
     @staticmethod
     def image2tensor(image, processor):
         if image.mode in ['RGBA', 'LA']: image = image.convert('RGB')
-        import pdb;pdb.set_trace()
         inputs = processor(images=image, return_tensors="pt")
         return inputs
 
