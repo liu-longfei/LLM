@@ -1,5 +1,8 @@
 .idea
 **/output**
 *.log
-# 忽略所有 Python 缓存文件夹
-**/__pycache__**
+# 忽略所有 __pycache__ 文件夹（任意层级）
+**/__pycache__*
+*.pyc
+**/outs**
+**/checkpoints**
