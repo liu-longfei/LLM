@@ -1,0 +1,5 @@
+{
+  "hidden_size": 256,
+  "model_type": "my_custom_model",
+  "transformers_version": "4.57.6"
+}
