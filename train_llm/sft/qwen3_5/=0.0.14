@@ -1,0 +1,10 @@
+Looking in indexes: https://pypi.tuna.tsinghua.edu.cn/simple
+Requirement already satisfied: qwen_vl_utils in /home/user/llm_lr/lib/python3.12/site-packages (0.0.14)
+Requirement already satisfied: av in /home/user/llm_lr/lib/python3.12/site-packages (from qwen_vl_utils) (18.1.0)
+Requirement already satisfied: packaging in /home/user/llm_lr/lib/python3.12/site-packages (from qwen_vl_utils) (26.3)
+Requirement already satisfied: pillow in /home/user/llm_lr/lib/python3.12/site-packages (from qwen_vl_utils) (11.3.0)
+Requirement already satisfied: requests in /home/user/llm_lr/lib/python3.12/site-packages (from qwen_vl_utils) (2.34.2)
+Requirement already satisfied: charset_normalizer<4,>=2 in /home/user/llm_lr/lib/python3.12/site-packages (from requests->qwen_vl_utils) (3.5.1)
+Requirement already satisfied: idna<4,>=2.5 in /home/user/llm_lr/lib/python3.12/site-packages (from requests->qwen_vl_utils) (3.19)
+Requirement already satisfied: urllib3<3,>=1.26 in /home/user/llm_lr/lib/python3.12/site-packages (from requests->qwen_vl_utils) (2.7.0)
+Requirement already satisfied: certifi>=2023.5.7 in /home/user/llm_lr/lib/python3.12/site-packages (from requests->qwen_vl_utils) (2026.7.22)

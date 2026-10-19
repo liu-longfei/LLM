@@ -1,0 +1,28 @@
+{
+    "bf16": {
+      "enabled": true
+    },
+    "zero_optimization": {
+      "stage": 3,
+      "offload_optimizer": {
+        "device": "none",
+        "pin_memory": true
+      },
+      "offload_param": {
+        "device": "cpu",
+        "pin_memory": true
+      },
+      "contiguous_gradients": true,
+      "overlap_comm": false,
+      "stage3_max_live_parameters": 100000000,
+      "stage3_max_reuse_distance": 100000000,
+      "stage3_prefetch_bucket_size": 100000000,
+      "stage3_gather_16bit_weights_on_model_save": true
+    },
+    "train_micro_batch_size_per_gpu": 1,
+    "train_batch_size": 2,
+    "gradient_accumulation_steps": 2,
+    "steps_per_print": 2000,
+    "wall_clock_breakdown": false
+  }
+  
