@@ -3,6 +3,10 @@
 *.log
 # 忽略所有 __pycache__ 文件夹（任意层级）
 **/__pycache__*
+__pycache__/
+**/__pycache__/
 *.pyc
 **/outs**
 **/checkpoints**
+# 忽略所有 .pt 文件（任意层级）
+*.pt

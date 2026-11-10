@@ -1,4 +1,9 @@
 import os
+import sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+import os
 import torch
 import torch.nn as nn
 from matplotlib import pyplot as plt
@@ -63,6 +68,10 @@ def train(args):
     device = args.device
     dataloader = get_data(args)
     model = UNet().to(device)
+    if args.resume_model:
+        print(f"args.resume_model 不为空，加载预训练模型：{args.resume_model}")
+        checkpoint = torch.load(args.resume_model, map_location=device)
+        model.load_state_dict(checkpoint)
     optimizer = optim.AdamW(model.parameters(), lr=args.lr)
     mse = nn.MSELoss()
     diffusion = Diffusion(img_size=args.image_size, device=device)
@@ -85,9 +94,9 @@ def train(args):
 
             pbar.set_postfix(MSE=loss.item())
             logger.add_scalar("MSE", loss.item(), global_step=epoch * l + i)
-
-        sampled_images = diffusion.sample(model, n=images.shape[0])
-        save_images(sampled_images, os.path.join("results", args.run_name, f"{epoch}.jpg"))
+        if epoch % 100 == 0 and epoch != 0:
+            sampled_images = diffusion.sample(model, n=images.shape[0])
+            save_images(sampled_images, os.path.join("results", args.run_name, f"{epoch}.jpg"))
         torch.save(model.state_dict(), os.path.join("models", args.run_name, f"ckpt.pt"))
 
 
@@ -96,10 +105,11 @@ def launch():
     parser = argparse.ArgumentParser()
     args = parser.parse_args()
     args.run_name = "DDPM_Uncondtional"
-    args.epochs = 500
+    args.epochs = 1000
     args.batch_size = 12
     args.image_size = 64
-    args.dataset_path = r"C:\Users\dome\datasets\landscape_img_folder"
+    args.dataset_path = "/home/user/ubuntu/datasets/landscape_img_folder_shui"
+    args.resume_model = None
     args.device = "cuda"
     args.lr = 3e-4
     train(args)
