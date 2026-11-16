@@ -1,16 +1,9 @@
-"""Visualize one CIFAR-10 training image from each class.
-
-The output grid intentionally matches the inference grid layout used by
-``infer_cifar_10.py``: raw 32x32 RGB images, 10 images per row, and the same
-default image padding.
-"""
+"""Visualize one CIFAR-10 training image from each class in a single grid."""
 
 import argparse
 
-import torch
+import matplotlib.pyplot as plt
 import torchvision
-import torchvision.transforms.functional as TF
-import torchvision.utils
 
 
 CLASS_NAMES = [
@@ -41,17 +34,28 @@ def parse_args() -> argparse.Namespace:
         default="cifar10_train_examples.png",
         help="Output visualization file path.",
     )
+    parser.add_argument(
+        "--dpi",
+        type=int,
+        default=200,
+        help="Output image DPI.",
+    )
+    parser.add_argument(
+        "--show",
+        action="store_true",
+        help="Show the plot after saving it.",
+    )
     return parser.parse_args()
 
 
-def find_one_image_per_class(dataset: torchvision.datasets.CIFAR10) -> torch.Tensor:
-    """Find the first occurrence of each class and return a stacked tensor."""
+def find_one_image_per_class(dataset: torchvision.datasets.CIFAR10):
+    """Find the first occurrence of each class and return (images, labels)."""
     images = [None] * len(CLASS_NAMES)
     found = set()
 
     for image, label in dataset:
         if label not in found:
-            images[label] = TF.pil_to_tensor(image).float() / 255.0
+            images[label] = image
             found.add(label)
         if len(found) == len(CLASS_NAMES):
             break
@@ -60,18 +64,22 @@ def find_one_image_per_class(dataset: torchvision.datasets.CIFAR10) -> torch.Ten
     if missing:
         raise RuntimeError(f"Could not find images for labels: {missing}")
 
-    return torch.stack(images)
+    return images
 
 
-def visualize(images: torch.Tensor, output_path: str) -> None:
-    """Save a grid matching ``infer_cifar_10.py`` output layout."""
-    torchvision.utils.save_image(
-        images,
-        output_path,
-        nrow=min(10, images.size(0)),
-        padding=2,
-        pad_value=0.0,
-    )
+def visualize(images, output_path: str, dpi: int) -> None:
+    """Save a 2x5 visualization containing one image from every class."""
+    fig, axes = plt.subplots(2, 5, figsize=(12, 5.5))
+
+    for label, image in enumerate(images):
+        ax = axes[label // 5][label % 5]
+        ax.imshow(image)
+        ax.set_title(f"{label}: {CLASS_NAMES[label]}")
+        ax.axis("off")
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=dpi, bbox_inches="tight")
+    plt.close(fig)
 
 
 def main() -> None:
@@ -85,9 +93,11 @@ def main() -> None:
     )
 
     images = find_one_image_per_class(dataset)
-    visualize(images, args.output)
+    visualize(images, args.output, args.dpi)
     print(f"Saved visualization to {args.output}")
-    print("Layout: 10 images per row, 32x32 images, padding=2 (matches inference).")
+
+    if args.show:
+        plt.show()
 
 
 if __name__ == "__main__":
