@@ -1,0 +1,4 @@
+我的本地访问不通huggingface，我在modelscope上下载了数据和模型，可运行代码还要从huggingface上下载，应该怎么办：
+/home/user/ubuntu/pretrain/SmolVLM2-500M-Video-Instruct
+/home/user/ubuntu/pretrain/smolvla_base
+/home/user/ubuntu/datasets/svla_so101_pickplace

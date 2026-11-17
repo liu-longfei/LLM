@@ -10,3 +10,4 @@ __pycache__/
 **/checkpoints**
 # 忽略所有 .pt 文件（任意层级）
 *.pt
+**/local_smolvla_base/
